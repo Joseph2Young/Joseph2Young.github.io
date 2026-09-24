@@ -1,0 +1,11 @@
+{
+  "name": "核心资产及策略评分看板",
+  "short_name": "策略看板",
+  "description": "质量微盘 / 红利成长 / 核心资产 三子策略持仓与动量评分",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2f6fed",
+  "icons": []
+}
