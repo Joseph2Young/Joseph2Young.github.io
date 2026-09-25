@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#2f6fed">
 <style>
   :root{
-    /* 独立站点主题: 浅色默认 */
-    --up: #2f6fed;
-    --down: #d97f8d;
+    /* 独立站点主题: 浅色默认; 红涨蓝跌 */
+    --up: #d5495c;
+    --down: #2f6fed;
     --c-text: #1a1a1a;
     --c-text2: #555;
     --c-text3: #888;
@@ -23,8 +23,8 @@
     --s4: #aaa;
   }
   html[data-theme="dark"]{
-    --up: #5b93ff;
-    --down: #e58a99;
+    --up: #e06c75;
+    --down: #5b93ff;
     --c-text: #e8e8ea;
     --c-text2: #b0b0b4;
     --c-text3: #8a8a90;
@@ -38,8 +38,8 @@
   }
   @media (prefers-color-scheme: dark){
     html:not([data-theme="light"]):not([data-theme="dark"]){
-      --up: #5b93ff;
-      --down: #e58a99;
+      --up: #e06c75;
+      --down: #5b93ff;
       --c-text: #e8e8ea;
       --c-text2: #b0b0b4;
       --c-text3: #8a8a90;
@@ -110,20 +110,22 @@
   .tile{border-radius:4px;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;box-sizing:border-box;}
   .tile .nm{font-size:11px;line-height:14px;color:var(--c-text);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .tile .sb{font-size:9px;line-height:12px;color:var(--c-text3);max-width:100%;overflow:hidden;white-space:nowrap;}
+  .code{font-size:9px;color:var(--c-text3);line-height:12px;}
   .tile .pc{font-size:12px;font-weight:500;line-height:15px;white-space:nowrap;}
   .t-up{background:color-mix(in srgb, var(--up) 13%, var(--c-muted));}
-  .t-down{background:color-mix(in srgb, #d5495c 12%, var(--c-muted));}
+  .t-down{background:color-mix(in srgb, var(--down) 12%, var(--c-muted));}
   .t-flat{background:var(--c-muted);}
   .t-core{background:color-mix(in srgb, var(--s3) 14%, var(--c-muted));}
   /* 窄屏(手机): 条带改等宽网格(每行5格), 免横滑, 各组格子大小一致 */
   @media (max-width:560px){
     .bandbody{flex-wrap:wrap;overflow:visible;}
     .tile{flex:1 1 calc(20% - 2px);min-width:0;}
-    .tile .sb{display:none;}
+    .tile .sb{display:block;font-size:8px;}
     .tile .nm{font-size:10px;}
     .tile .pc{font-size:10px;}
   }
   .legend{display:flex;gap:14px;font-size:10px;color:var(--c-text3);margin-block-start:6px;line-height:14px;flex-wrap:wrap;}
+  .lg-brief{display:none;}
 
   /* ---------- 持仓明细 ---------- */
   .detail{display:grid;grid-template-columns:1.15fr 1.15fr 1fr;gap:16px;margin-block-start:8px;}
@@ -203,13 +205,15 @@
   /* 页签: 加大触控面积 */
   .tab{font-size:13px;padding:7px 12px;}
 
-  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致 */
+  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致; 名称下显示代码 */
   .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;}
   .tile{flex:1 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
-  .tile .sb{display:none;}
+  .tile .sb{font-size:8px;}
   .tile .nm{font-size:11px;}
   .tile .pc{font-size:11px;}
   .legend{gap:10px;}
+  .lg-full{display:none;}
+  .lg-brief{display:inline;}
 
   /* 持仓明细: 三栏堆叠为单栏, 各表格内部可横滑 */
   .detail{grid-template-columns:1fr;gap:16px;}
@@ -259,7 +263,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-25 15:18:04",
+  "generated_at": "2026-09-25 16:41:35",
   "selection_date": "2026-09-24",
   "quote_date": "2026-09-24",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -2123,6 +2127,8 @@ function loadRemoteData(){
 }
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function code6(c){ return String(c==null?'':c).slice(0,6); }
+function nameCode(nm, code){ return esc(nm)+'<br><span class="code num">'+code6(code)+'</span>'; }
 function fp(v,d){ if(v==null||isNaN(v)) return '—'; return Number(v).toFixed(d==null?2:d); }
 function pct(v){ if(v==null||isNaN(v)) return '—'; return (v>0?'+':'')+fp(v,2)+'%'; }
 function cls(v){ return v==null?'flat':(v>0?'up':(v<0?'down':'flat')); }
@@ -2240,17 +2246,18 @@ function renderMap(d){
 
   var b1 = d.b1.holdings||[];
   var b1Tiles = b1.map(function(x){
-    return tileHtml(x.name, '流通'+fp(x.circ_mv,0)+'亿', x.pct_chg);
+    return tileHtml(x.name, code6(x.code), x.pct_chg);
   }).join('');
 
   var dv = d.dividend.holdings||[];
   var dvTiles = dv.map(function(x){
-    return tileHtml(x.name, 'PB '+fp(x.pb,2), x.pct_chg);
+    return tileHtml(x.name, code6(x.code), x.pct_chg);
   }).join('');
 
   var etf = d.etf||{};
   var pool = etf.pool||[];
   var tgtNames = (etf.targets||[]).map(function(t){return t.name;}).join('/');
+  var tgtCodes = (etf.targets||[]).map(function(t){return code6(t.code);}).join('/');
   var corePct = null;
   if((etf.targets||[]).length){
     var sum = etf.targets.reduce(function(s,t){
@@ -2259,7 +2266,7 @@ function renderMap(d){
     }, 0);
     corePct = Math.round(sum*100)/100;
   }
-  var coreTile = tileHtml(tgtNames||'持有现金', null, corePct, 't-core');
+  var coreTile = tileHtml(tgtNames||'持有现金', tgtCodes||null, corePct, 't-core');
 
   var html = ''
     + band('质量微盘', '10只 · 一年 '+pct(d.b1.ret_1y)+' · 配置 62.5%', hB, b1Tiles)
@@ -2268,7 +2275,8 @@ function renderMap(d){
 
   wrap.innerHTML=html;
   $('map-legend').innerHTML='<span><span class="up">●</span> 上涨</span><span><span class="down">●</span> 下跌</span>'
-    +'<span>条带高度=配置权重 · 组内等宽=成分股 · 颜色=今日涨跌</span>';
+    +'<span class="lg-full">条带高度=配置权重 · 组内等宽=成分股 · 颜色=今日涨跌</span>'
+    +'<span class="lg-brief">颜色=今日涨跌</span>';
 }
 
 function tblRow(cols){
@@ -2280,9 +2288,9 @@ function tblRow(cols){
 function renderDetail(d){
   var b1=(d.b1.holdings||[]).slice().sort(function(a,b){return a.circ_mv-b.circ_mv;});
   var h='<div><h4>质量微盘 · 按流通市值升序 <span class="rt">一年 '+pct(d.b1.ret_1y)+'</span></h4><table class="dtable"><tr><th>名称</th><th>流通市值(亿)</th><th>股东合成分</th><th>涨跌幅</th></tr>';
-  b1.forEach(function(x){ h+=tblRow([esc(x.name),fp(x.circ_mv,1),(x.holder_comp==null?'—':fp(x.holder_comp,3)),pctHtml(x.pct_chg)]); });
+  b1.forEach(function(x){ h+=tblRow([nameCode(x.name,x.code),fp(x.circ_mv,1),(x.holder_comp==null?'—':fp(x.holder_comp,3)),pctHtml(x.pct_chg)]); });
   h+='</table></div><div><h4>红利成长 <span class="rt">一年 '+pct(d.dividend.ret_1y)+'</span></h4><table class="dtable"><tr><th>名称</th><th>PB</th><th>PE</th><th>股息率</th><th>涨跌幅</th></tr>';
-  (d.dividend.holdings||[]).forEach(function(x){ h+=tblRow([esc(x.name),fp(x.pb,2),fp(x.pe,1),(x.dv_ttm==null?'—':fp(x.dv_ttm,2)+'%'),pctHtml(x.pct_chg)]); });
+  (d.dividend.holdings||[]).forEach(function(x){ h+=tblRow([nameCode(x.name,x.code),fp(x.pb,2),fp(x.pe,1),(x.dv_ttm==null?'—':fp(x.dv_ttm,2)+'%'),pctHtml(x.pct_chg)]); });
   h+='</table></div><div><h4>核心资产 · 双轨动量 <span class="rt">'+coreTargetText(d.etf)+'</span></h4>';
   h+=trackTable(d.etf, '短轨');
   h+=trackTable(d.etf, '慢轨');
@@ -2292,32 +2300,37 @@ function renderDetail(d){
 function coreTargetText(etf){
   etf=etf||{};
   if(etf.cash) return '空仓 · 持有现金';
-  return (etf.targets||[]).map(function(t){return t.name+' '+Math.round(t.weight*100)+'%';}).join(' + ')||'—';
+  return (etf.targets||[]).map(function(t){return t.name+' '+code6(t.code)+' '+Math.round(t.weight*100)+'%';}).join(' + ')||'—';
 }
 function trackTable(etf, tname){
   etf=etf||{};
   var t=(etf.tracks||{})[tname];
   if(!t) return '';
+  var label = tname==='短轨'?'短周期':(tname==='慢轨'?'长周期':tname);
   var rows='';
-  Object.keys(t.detail||{}).forEach(function(code){
+  var codes=Object.keys(t.detail||{}).sort(function(a,b){
+    var sa=t.detail[a].score, sb=t.detail[b].score;
+    return (sb==null?-1e9:sb)-(sa==null?-1e9:sa);
+  });
+  codes.forEach(function(code){
     var dd=t.detail[code];
     var picked=(t.pick===code);
-    rows+='<tr'+(picked?' class="pick"':'')+'><td>'+(picked?'● ':'')+esc(dd.name)+'</td>'
+    rows+='<tr'+(picked?' class="pick"':'')+'><td>'+(picked?'● ':'')+nameCode(dd.name, code)+'</td>'
       +'<td class="num '+(dd.annualized>0?'up':(dd.annualized<0?'down':'flat'))+'">'+pct(dd.annualized*100)+'</td>'
       +'<td class="num">'+fp(dd.r2,2)+'</td>'
       +'<td class="num '+scoreCls(dd.score)+'">'+fmtScore(dd.score)+'</td>'
       +'<td class="num">'+(dd.pass?'✓':'—')+'</td></tr>';
   });
-  return '<div class="trk">'+tname+' · '+t.window+'日 · 年化≤'+fp(t.ann_cap,1)+' · R²≥'+fp(t.r2_floor,1)
+  return '<div class="trk">'+label
     +(t.pick_name?(' → '+t.pick_name):' → 无满足标的')+'</div>'
     +'<table class="dtable"><tr><th>名称</th><th>年化</th><th>R²</th><th>得分</th><th>命中</th></tr>'+rows+'</table>';
 }
 function coreSignalText(etf){
   etf=etf||{};
   if(etf.cash) return '双轨均无满足条件的标的，<b>持有现金</b>';
-  var s='目标持仓：'+(etf.targets||[]).map(function(t){return '<b>'+esc(t.name)+'</b> '+Math.round(t.weight*100)+'%';}).join(' + ');
+  var s='目标持仓：'+(etf.targets||[]).map(function(t){return '<b>'+esc(t.name)+'</b> '+code6(t.code)+' '+Math.round(t.weight*100)+'%';}).join(' + ');
   if((etf.excluded||[]).length){
-    s+='；剔除：'+(etf.excluded||[]).map(function(e){return esc(e.name)+'（'+esc(e.reason)+'）';}).join('、');
+    s+='；剔除：'+(etf.excluded||[]).map(function(e){return esc(e.name)+' '+code6(e.code)+'（'+esc(e.reason)+'）';}).join('、');
   }
   return s;
 }
