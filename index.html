@@ -115,6 +115,14 @@
   .t-down{background:color-mix(in srgb, #d5495c 12%, var(--c-muted));}
   .t-flat{background:var(--c-muted);}
   .t-core{background:color-mix(in srgb, var(--s3) 14%, var(--c-muted));}
+  /* 窄屏(手机): 条带可横滑, 隐藏副标, 保证名称与涨跌幅可读 */
+  @media (max-width:560px){
+    .bandbody{overflow-x:auto;}
+    .tile{flex:0 0 auto;min-width:56px;}
+    .tile .sb{display:none;}
+    .tile .nm{font-size:10px;}
+    .tile .pc{font-size:10px;}
+  }
   .legend{display:flex;gap:14px;font-size:10px;color:var(--c-text3);margin-block-start:6px;line-height:14px;flex-wrap:wrap;}
 
   /* ---------- 持仓明细 ---------- */
@@ -196,8 +204,8 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-24 23:55:18",
-  "selection_date": "2026-09-23",
+  "generated_at": "2026-09-25 00:01:45",
+  "selection_date": "2026-09-24",
   "quote_date": "2026-09-24",
   "source": "Tushare(主) / Wind 万得(备)",
   "backup_used": [],
@@ -218,55 +226,55 @@
    {
     "code": "301152",
     "name": "天力锂能",
-    "circ_mv": 15.1,
-    "holder_comp": 0.1719,
+    "circ_mv": 14.9,
+    "holder_comp": 0.175,
     "close": 21.02,
     "pct_chg": -0.8491
    },
    {
     "code": "600561",
     "name": "江西长运",
-    "circ_mv": 16.6,
-    "holder_comp": 0.2994,
+    "circ_mv": 16.7,
+    "holder_comp": 0.3006,
     "close": 5.88,
     "pct_chg": 0.5128
    },
    {
     "code": "002910",
     "name": "庄园牧场",
-    "circ_mv": 17.2,
-    "holder_comp": 0.2375,
+    "circ_mv": 17.1,
+    "holder_comp": 0.2406,
     "close": 9.98,
     "pct_chg": -0.4985
    },
    {
-    "code": "603168",
-    "name": "莎普爱思",
-    "circ_mv": 21.8,
-    "holder_comp": 0.2119,
-    "close": 5.85,
-    "pct_chg": -0.1706
-   },
-   {
     "code": "300575",
     "name": "中旗股份",
-    "circ_mv": 21.9,
+    "circ_mv": 21.6,
     "holder_comp": 0.5,
     "close": 6.25,
     "pct_chg": -1.1076
    },
    {
+    "code": "603168",
+    "name": "莎普爱思",
+    "circ_mv": 21.8,
+    "holder_comp": 0.215,
+    "close": 5.85,
+    "pct_chg": -0.1706
+   },
+   {
     "code": "300240",
     "name": "飞力达",
-    "circ_mv": 22.1,
-    "holder_comp": 0.0594,
+    "circ_mv": 22.2,
+    "holder_comp": 0.0612,
     "close": 6.1,
     "pct_chg": 0.1642
    },
    {
     "code": "600774",
     "name": "汉商集团",
-    "circ_mv": 22.4,
+    "circ_mv": 22.2,
     "holder_comp": 0.4231,
     "close": 7.7,
     "pct_chg": -0.9009
@@ -274,15 +282,15 @@
    {
     "code": "300980",
     "name": "祥源新材",
-    "circ_mv": 24.1,
-    "holder_comp": 0.2731,
+    "circ_mv": 23.7,
+    "holder_comp": 0.2775,
     "close": 23.69,
     "pct_chg": -1.8641
    },
    {
     "code": "600854",
     "name": "春兰股份",
-    "circ_mv": 24.5,
+    "circ_mv": 24.6,
     "holder_comp": 0.395,
     "close": 4.73,
     "pct_chg": 0.2119
@@ -290,8 +298,8 @@
    {
     "code": "002136",
     "name": "安纳达",
-    "circ_mv": 25.3,
-    "holder_comp": 0.1419,
+    "circ_mv": 25.1,
+    "holder_comp": 0.1481,
     "close": 11.72,
     "pct_chg": -0.5093
    }
@@ -451,20 +459,20 @@
    {
     "code": "603444",
     "name": "吉比特",
-    "pb": 4.1,
-    "pe": 13.8,
-    "pe_ttm": 11.1,
-    "dv_ttm": 6.65,
+    "pb": 4.07,
+    "pe": 13.7,
+    "pe_ttm": 11.0,
+    "dv_ttm": 6.7,
     "close": 342.0,
     "pct_chg": -0.7487
    },
    {
     "code": "601318",
     "name": "中国平安",
-    "pb": 0.95,
+    "pb": 0.94,
     "pe": 7.2,
     "pe_ttm": 6.1,
-    "dv_ttm": 5.07,
+    "dv_ttm": 5.13,
     "close": 53.25,
     "pct_chg": -1.1509
    },
@@ -481,20 +489,20 @@
    {
     "code": "603998",
     "name": "方盛制药",
-    "pb": 2.58,
-    "pe": 15.0,
-    "pe_ttm": 13.7,
-    "dv_ttm": 4.78,
+    "pb": 2.54,
+    "pe": 14.7,
+    "pe_ttm": 13.5,
+    "dv_ttm": 4.86,
     "close": 10.29,
     "pct_chg": -1.5311
    },
    {
     "code": "603889",
     "name": "新澳股份",
-    "pb": 1.53,
-    "pe": 12.0,
+    "pb": 1.52,
+    "pe": 11.9,
     "pe_ttm": 10.7,
-    "dv_ttm": 4.45,
+    "dv_ttm": 4.46,
     "close": 6.03,
     "pct_chg": -0.3306
    }
