@@ -233,12 +233,7 @@
     <span class="sp"></span>
     <button class="linkbtn" id="btn-quote" title="刷新当前涨跌幅">刷新行情</button>
     <button class="linkbtn" id="btn-theme" title="切换浅色/深色主题">主题</button>
-    <button class="linkbtn" id="btn-src" aria-pressed="false">来源与口径</button>
-    <button class="linkbtn" id="btn-ind" aria-pressed="false">技术指标</button>
   </div>
-
-  <div class="panel" id="pnl-src"></div>
-  <div class="panel" id="pnl-ind"></div>
 
   <div class="kpi" id="kpi"></div>
 
@@ -264,7 +259,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-25 14:59:10",
+  "generated_at": "2026-09-25 15:18:04",
   "selection_date": "2026-09-24",
   "quote_date": "2026-09-24",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -2195,29 +2190,11 @@ function render(d){
   if(!d || !d.b1) return;
   var meta=d.meta||{};
   $('hd-meta').textContent='行情 '+ (meta.quote_date||'—') +' · 选股基准 '+(meta.selection_date||'—') + (meta.generated_at?(' · 更新于 '+meta.generated_at.slice(5,16)):'');
-  renderPanels(d);
   renderKpi(d);
   renderMap(d);
   renderDetail(d);
   renderChart(d);
   renderMomentum(d);
-}
-
-function renderPanels(d){
-  var meta=d.meta||{};
-  var src='<h4>数据来源与口径</h4><ul>'
-    +'<li>数据源：'+esc(meta.source||'—')+(meta.backup_used&&meta.backup_used.length?'（本次备用源启用：'+esc(meta.backup_used.join('、'))+'）':'')+'</li>'
-    +'<li>盘中刷新：打开看板时，交易时段（9:25-11:35、12:55-15:05）每 15 分钟自动刷新持仓涨跌幅（腾讯行情公开快照，仅更新价格与涨跌幅，持仓名单不变）；也可用右上角「刷新行情」按钮手动刷新；看板未打开时不产生任何请求</li>'
-    +'<li>选股估值/财务快照：'+esc(meta.selection_date||'—')+'（T-1 昨收口径）；行情展示：'+esc(meta.quote_date||'—')+'</li></ul><ul>';
-  (meta.caliber_notes||[]).forEach(function(n){ src+='<li>'+esc(n)+'</li>'; });
-  src+='</ul>';
-  $('pnl-src').innerHTML=src;
-  $('pnl-ind').innerHTML='<h4>技术指标说明</h4>'
-    +'<p>动量评分：对收盘价取对数后做时间线性回归，评分 = 年化收益 × R²。年化收益 = exp(斜率)^250 − 1，R² 衡量趋势平滑度；得分越高代表趋势越强且越稳。</p>'
-    +'<p>子策略多周期得分：对质量微盘当前 10 只持仓、红利当前 5 只持仓分别构建等权篮子（前复权），核心资产取双轨虚拟账户净值曲线，分别取 5/10/15/20 个交易日窗口计算。</p>'
-    +'<p>核心资产双轨动量：短轨取 22 日窗口（年化 ≤ 7.0 且 R² ≥ 0.4）、慢轨取 250 日窗口（年化 ≤ 0.8 且 R² ≥ 0.6），各轨在满足条件的 ETF（黄金、纳指100、创业板、沪深300、能源化工）中取动量得分最高者；两腿各半仓，同选合并满仓；竞价停牌或开盘价涨停的标的剔除后重算满仓；双轨皆无满足标的则持有现金。表内「命中」= 同时满足年化上限与 R² 下限，● 为该轨选中。</p>'
-    +'<p>质量微盘（ROEC v7，无季节审查）：剔次新（上市&lt;250天）/688/ST → PB&gt;0 且 EPS&gt;0 取前 50% → ROE 近 5 季改善（4×最新季 − 前 4 季之和）前 10% → 股东合成分前 50% 硬过滤 → 流通市值升序前 10。股东合成分 = 0.30×HHI + 0.50×CR1 + 0.20×(1−FLNINS) 的升序分位加权，股东结构取 20251231 报告期前十大股东；股东数据整体缺失时回退不过滤。</p>'
-    +'<p>一年收益：微盘为中证2000 指数代理、红利为中证红利指数代理、核心资产为逐日轮动回放（无费率），组合按 62.5% / 31.25% / 6.25% 加权。</p>';
 }
 
 function renderKpi(d){
@@ -2439,13 +2416,6 @@ function bind(){
     $('view-detail').style.display=state.tab==='detail'?'':'none';
     $('view-trend').style.display=state.tab==='trend'?'':'none';
     if(state.tab==='trend'){ renderChart(ensureView()); }
-  });
-  [['btn-src','pnl-src'],['btn-ind','pnl-ind']].forEach(function(pair){
-    var btn=$(pair[0]), pnl=$(pair[1]);
-    if(btn) btn.addEventListener('click',function(){
-      var open=pnl.classList.toggle('open');
-      btn.setAttribute('aria-pressed',open?'true':'false');
-    });
   });
 }
 
