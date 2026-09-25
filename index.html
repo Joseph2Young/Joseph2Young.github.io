@@ -205,15 +205,13 @@
   /* 页签: 加大触控面积 */
   .tab{font-size:13px;padding:7px 12px;}
 
-  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致; 名称下显示代码 */
+  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致 */
   .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;}
   .tile{flex:1 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
-  .tile .sb{font-size:8px;}
+  .tile .sb{display:none;}
   .tile .nm{font-size:11px;}
   .tile .pc{font-size:11px;}
   .legend{gap:10px;}
-  .lg-full{display:none;}
-  .lg-brief{display:inline;}
 
   /* 持仓明细: 三栏堆叠为单栏, 各表格内部可横滑 */
   .detail{grid-template-columns:1fr;gap:16px;}
