@@ -115,10 +115,10 @@
   .t-down{background:color-mix(in srgb, #d5495c 12%, var(--c-muted));}
   .t-flat{background:var(--c-muted);}
   .t-core{background:color-mix(in srgb, var(--s3) 14%, var(--c-muted));}
-  /* 窄屏(手机): 条带可横滑, 隐藏副标, 保证名称与涨跌幅可读 */
+  /* 窄屏(手机): 条带改等宽网格(每行5格), 免横滑, 各组格子大小一致 */
   @media (max-width:560px){
-    .bandbody{overflow-x:auto;}
-    .tile{flex:0 0 auto;min-width:56px;}
+    .bandbody{flex-wrap:wrap;overflow:visible;}
+    .tile{flex:1 1 calc(20% - 2px);min-width:0;}
     .tile .sb{display:none;}
     .tile .nm{font-size:10px;}
     .tile .pc{font-size:10px;}
@@ -256,7 +256,7 @@
   </div>
 
   <div class="mom">
-    <div class="mh"><span class="mt">子策略多周期动量得分</span><span class="hint">年化收益 × R²（对数回归），20/60/120/250 个交易日窗口</span></div>
+    <div class="mh"><span class="mt">子策略多周期动量得分</span><span class="hint">年化收益 × R²（对数回归），5/10/15/20 个交易日窗口</span></div>
     <div id="mom-body"></div>
   </div>
 </div>
@@ -264,7 +264,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-25 13:57:20",
+  "generated_at": "2026-09-25 14:42:36",
   "selection_date": "2026-09-24",
   "quote_date": "2026-09-24",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -572,22 +572,22 @@
  },
  "strategy_scores": {
   "质量微盘": {
-   "20": -0.1497,
-   "60": 0.2152,
-   "120": -0.1923,
-   "250": -0.1296
+   "5": 0.0881,
+   "10": 0.7073,
+   "15": -0.0767,
+   "20": -0.1497
   },
   "红利成长": {
-   "20": -0.4852,
-   "60": 0.2145,
-   "120": -0.0708,
-   "250": -0.0252
+   "5": -0.3469,
+   "10": -0.4818,
+   "15": -0.6531,
+   "20": -0.4852
   },
   "核心资产": {
-   "20": 0.3509,
-   "60": 0.0396,
-   "120": -0.0015,
-   "250": 0.0164
+   "5": -0.049,
+   "10": -0.0,
+   "15": 0.5513,
+   "20": 0.3509
   }
  },
  "portfolio": {
@@ -2214,7 +2214,7 @@ function renderPanels(d){
   $('pnl-src').innerHTML=src;
   $('pnl-ind').innerHTML='<h4>技术指标说明</h4>'
     +'<p>动量评分：对收盘价取对数后做时间线性回归，评分 = 年化收益 × R²。年化收益 = exp(斜率)^250 − 1，R² 衡量趋势平滑度；得分越高代表趋势越强且越稳。</p>'
-    +'<p>子策略多周期得分：对质量微盘当前 10 只持仓、红利当前 5 只持仓分别构建等权篮子（前复权），核心资产取双轨虚拟账户净值曲线，分别取 20/60/120/250 个交易日窗口计算。</p>'
+    +'<p>子策略多周期得分：对质量微盘当前 10 只持仓、红利当前 5 只持仓分别构建等权篮子（前复权），核心资产取双轨虚拟账户净值曲线，分别取 5/10/15/20 个交易日窗口计算。</p>'
     +'<p>核心资产双轨动量：短轨取 22 日窗口（年化 ≤ 7.0 且 R² ≥ 0.4）、慢轨取 250 日窗口（年化 ≤ 0.8 且 R² ≥ 0.6），各轨在满足条件的 ETF（黄金、纳指100、创业板、沪深300、能源化工）中取动量得分最高者；两腿各半仓，同选合并满仓；竞价停牌或开盘价涨停的标的剔除后重算满仓；双轨皆无满足标的则持有现金。表内「命中」= 同时满足年化上限与 R² 下限，● 为该轨选中。</p>'
     +'<p>质量微盘（ROEC v7，无季节审查）：剔次新（上市&lt;250天）/688/ST → PB&gt;0 且 EPS&gt;0 取前 50% → ROE 近 5 季改善（4×最新季 − 前 4 季之和）前 10% → 股东合成分前 50% 硬过滤 → 流通市值升序前 10。股东合成分 = 0.30×HHI + 0.50×CR1 + 0.20×(1−FLNINS) 的升序分位加权，股东结构取 20251231 报告期前十大股东；股东数据整体缺失时回退不过滤。</p>'
     +'<p>一年收益：微盘为中证2000 指数代理、红利为中证红利指数代理、核心资产为逐日轮动回放（无费率），组合按 62.5% / 31.25% / 6.25% 加权。</p>';
@@ -2407,13 +2407,14 @@ function drawChart(series){
 
 function renderMomentum(d){
   var ss=d.strategy_scores||{};
+  var WS=['5','10','15','20'];
   var vals=[];
-  STRATS.forEach(function(s){ ['20','60','120','250'].forEach(function(w){ if(ss[s]&&ss[s][w]!=null) vals.push(Math.abs(ss[s][w])); }); });
+  STRATS.forEach(function(s){ WS.forEach(function(w){ if(ss[s]&&ss[s][w]!=null) vals.push(Math.abs(ss[s][w])); }); });
   var mx=vals.length?Math.max.apply(null,vals):1;
-  var h='<table><tr><th>子策略</th><th>20日</th><th>60日</th><th>120日</th><th>250日</th></tr>';
+  var h='<table><tr><th>子策略</th><th>5日</th><th>10日</th><th>15日</th><th>20日</th></tr>';
   STRATS.forEach(function(s){
     h+='<tr><td>'+s+'</td>';
-    ['20','60','120','250'].forEach(function(w){
+    WS.forEach(function(w){
       var v=ss[s]?ss[s][w]:null;
       if(v==null){ h+='<td>—</td>'; return; }
       var bw=Math.min(Math.abs(v)/mx*20,20).toFixed(1);
