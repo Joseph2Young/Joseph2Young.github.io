@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>核心资产及策略评分看板</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2f6fed">
@@ -164,6 +164,66 @@
   .mbar{position:absolute;top:0;height:5px;border-radius:3px;}
   .mbar.up{background:var(--up);} .mbar.down{background:var(--down);}
 </style>
+<style>
+/* 响应式适配: 由 build.py 在构建时注入 <head> 尾部(置于模板样式之后, 覆盖生效)
+   断点设计: ≤640px 手机 / 641-760px 窄桌面与平板竖屏 / >760px 桌面(模板原样) */
+
+/* ===== 全宽度通用: 防止 grid 子项内容溢出撑破布局 ===== */
+.detail>div,
+.mom #mom-body{min-width:0;}
+
+/* ===== 窄桌面/平板竖屏(≤760px): 表格防溢出, 内容过宽时内部横滑 ===== */
+@media (max-width:760px){
+  .detail>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .mom #mom-body{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+}
+
+/* ===== 手机(≤640px) ===== */
+@media (max-width:640px){
+  /* 刘海屏/圆角屏安全区(配合 viewport-fit=cover 生效) */
+  .root{
+    padding:12px 12px 10px;
+    padding-left:max(12px, env(safe-area-inset-left));
+    padding-right:max(12px, env(safe-area-inset-right));
+  }
+
+  /* 头部: 更紧凑, 按钮加大触控面积 */
+  .head{gap:4px;row-gap:6px;}
+  .head .t{font-size:15px;}
+  .linkbtn{font-size:12px;padding:4px 10px;}
+
+  /* KPI 首屏: 4列 -> 2×2 网格, 避免挤压截断 */
+  .kpi{grid-template-columns:1fr 1fr;}
+  .kpi .cell{padding-inline:10px;padding-block:6px;}
+  .kpi .cell:nth-child(3){border-inline-start:none;padding-inline-start:0;}
+  .kpi .cell:nth-child(n+3){border-block-start:1px solid var(--hairline);}
+  .kpi .val{font-size:19px;line-height:25px;}
+  .kpi .sub{font-size:10px;}
+
+  /* 页签: 加大触控面积 */
+  .tab{font-size:13px;padding:7px 12px;}
+
+  /* 资产地图: 条带横滑, 格子加宽保证名称与涨跌幅可读 */
+  .bandbody{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tile{flex:0 0 auto;min-width:64px;padding:3px 4px;}
+  .tile .sb{display:none;}
+  .tile .nm{font-size:11px;}
+  .tile .pc{font-size:11px;}
+  .legend{gap:10px;}
+
+  /* 持仓明细: 三栏堆叠为单栏, 各表格内部可横滑 */
+  .detail{grid-template-columns:1fr;gap:16px;}
+  .detail>div{padding-block-end:2px;}
+  .dtable{min-width:300px;}
+
+  /* 动量表: 保持可读宽度, 允许横滑 */
+  .mom table{min-width:360px;}
+  .mom .hint{display:block;margin-block-start:2px;}
+
+  /* 展开面板: 行高略加大便于触屏阅读 */
+  .panel li,.panel p{line-height:19px;}
+}
+</style>
 </head>
 <body>
 <div class="root" id="app">
@@ -204,7 +264,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-25 00:01:45",
+  "generated_at": "2026-09-25 13:57:26",
   "selection_date": "2026-09-24",
   "quote_date": "2026-09-24",
   "source": "Tushare(主) / Wind 万得(备)",
