@@ -203,9 +203,9 @@
   /* 页签: 加大触控面积 */
   .tab{font-size:13px;padding:7px 12px;}
 
-  /* 资产地图: 条带横滑, 格子加宽保证名称与涨跌幅可读 */
-  .bandbody{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .tile{flex:0 0 auto;min-width:64px;padding:3px 4px;}
+  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致 */
+  .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;}
+  .tile{flex:1 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
   .tile .sb{display:none;}
   .tile .nm{font-size:11px;}
   .tile .pc{font-size:11px;}
@@ -264,7 +264,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-25 14:42:36",
+  "generated_at": "2026-09-25 14:42:41",
   "selection_date": "2026-09-24",
   "quote_date": "2026-09-24",
   "source": "Tushare(主) / Wind 万得(备)",
