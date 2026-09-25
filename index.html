@@ -205,13 +205,15 @@
   /* 页签: 加大触控面积 */
   .tab{font-size:13px;padding:7px 12px;}
 
-  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致 */
+  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致; 名称下显示代码 */
   .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;}
   .tile{flex:1 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
-  .tile .sb{display:none;}
+  .tile .sb{font-size:8px;}
   .tile .nm{font-size:11px;}
   .tile .pc{font-size:11px;}
   .legend{gap:10px;}
+  .lg-full{display:none;}
+  .lg-brief{display:inline;}
 
   /* 持仓明细: 三栏堆叠为单栏, 各表格内部可横滑 */
   .detail{grid-template-columns:1fr;gap:16px;}
@@ -261,7 +263,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-25 16:41:35",
+  "generated_at": "2026-09-25 23:27:48",
   "selection_date": "2026-09-24",
   "quote_date": "2026-09-24",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -2133,7 +2135,7 @@ function cls(v){ return v==null?'flat':(v>0?'up':(v<0?'down':'flat')); }
 function pctHtml(v){ return '<span class="'+cls(v)+' num">'+pct(v)+'</span>'; }
 function scoreCls(v){ return v==null?'flat':(v>0?'up':(v<0?'down':'flat')); }
 var STRATS=['质量微盘','红利成长','核心资产'];
-var state={tab:'map', legend:{'微盘B1':true,'红利成长':true,'核心资产':true,'沪深300':false}};
+var state={tab:'map', legend:{'质量微盘':true,'红利成长':true,'核心资产':true,'沪深300':false}};
 
 /* ---------------- 盘中行情刷新(仅页面打开时运行; 15分钟定时+手动按钮) ----------------
    数据源: 腾讯行情公开接口(qt.gtimg.cn, 允许跨域); 仅刷新 close/pct_chg, 持仓名单不变 */
@@ -2336,7 +2338,7 @@ function coreSignalText(etf){
 function renderChart(d){
   var t=d.trends||{};
   var series=[
-    {name:'微盘B1',dates:t.dates_micro,nav:t.nav_micro,cls:'s1',dot:'d1'},
+    {name:'质量微盘',dates:t.dates_micro,nav:t.nav_micro,cls:'s1',dot:'d1'},
     {name:'红利成长',dates:t.dates_div,nav:t.nav_div,cls:'s2',dot:'d2'},
     {name:'核心资产',dates:t.dates_core,nav:t.nav_core,cls:'s3',dot:'d3'},
     {name:'沪深300',dates:t.dates_bench,nav:t.nav_bench,cls:'s4',dot:'d4'}
