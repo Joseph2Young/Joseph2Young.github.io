@@ -210,8 +210,7 @@
 
   /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致; 名称下显示代码 */
   .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;}
-  /* grow=0: 单标的(如核心资产)不再拉伸通栏, 与五列网格保持一致宽度 */
-  .tile{flex:0 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
+  .tile{flex:1 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
   .tile .sb{font-size:8px;}
   .tile .nm{font-size:11px;}
   .tile .pc{font-size:11px;}
@@ -268,7 +267,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-29 13:13:22",
+  "generated_at": "2026-09-29 13:13:18",
   "selection_date": "2026-09-28",
   "quote_date": "2026-09-28",
   "source": "Tushare(主) / Wind 万得(备)",
