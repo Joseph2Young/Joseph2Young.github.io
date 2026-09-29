@@ -118,7 +118,8 @@
   .t-core{background:color-mix(in srgb, var(--s3) 14%, var(--c-muted));}
   /* 窄屏(手机): 条带改等宽网格(每行5格), 免横滑, 各组格子大小一致 */
   @media (max-width:560px){
-    .bandbody{flex-wrap:wrap;overflow:visible;}
+    /* 高度改自适应: 桌面固定像素高度代表配置权重, 手机端已是等宽网格, 固定高度会裁切/溢出内容 */
+    .bandbody{flex-wrap:wrap;overflow:visible;height:auto !important;}
     /* grow=0: 单标的(如核心资产)不再拉伸通栏, 与五列网格保持一致宽度 */
     .tile{flex:0 1 calc(20% - 2px);min-width:0;}
     .tile .sb{display:block;font-size:8px;}
@@ -208,9 +209,10 @@
   /* 页签: 加大触控面积 */
   .tab{font-size:13px;padding:7px 12px;}
 
-  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致; 名称下显示代码 */
-  .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;}
-  .tile{flex:1 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
+  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致; 条带高度改自适应(桌面固定像素代表配置权重, 手机端会溢出重叠) */
+  .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;height:auto !important;}
+  /* grow=0: 单标的(如核心资产)不再拉伸通栏, 与五列网格保持一致宽度 */
+  .tile{flex:0 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
   .tile .sb{font-size:8px;}
   .tile .nm{font-size:11px;}
   .tile .pc{font-size:11px;}
@@ -267,7 +269,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-29 13:13:18",
+  "generated_at": "2026-09-29 13:34:06",
   "selection_date": "2026-09-28",
   "quote_date": "2026-09-28",
   "source": "Tushare(主) / Wind 万得(备)",
