@@ -222,8 +222,9 @@
   .detail>div{padding-block-end:2px;}
   .dtable{min-width:300px;}
 
-  /* 动量表: 自适应宽度(4档短窗口, 无需横滑) */
+  /* 动量表: 自适应宽度(4档短窗口, 无需横滑); 标题与说明文字纵向堆叠(父级仍是 flex, 需先改为 block) */
   .mom table{min-width:0;}
+  .mom .mh{display:block;}
   .mom .hint{display:block;margin-block-start:2px;}
 
   /* 展开面板: 行高略加大便于触屏阅读 */
@@ -265,7 +266,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-29 01:49:50",
+  "generated_at": "2026-09-29 11:41:34",
   "selection_date": "2026-09-28",
   "quote_date": "2026-09-28",
   "source": "Tushare(主) / Wind 万得(备)",
