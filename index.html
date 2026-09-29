@@ -209,8 +209,8 @@
   /* 页签: 加大触控面积 */
   .tab{font-size:13px;padding:7px 12px;}
 
-  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致; 名称下显示代码 */
-  .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;}
+  /* 资产地图: 等宽网格(每行5格), 免横滑, 各组格子大小一致; 条带高度改自适应(桌面固定像素代表配置权重, 手机端会溢出重叠) */
+  .bandbody{flex-wrap:wrap;overflow:visible;gap:2px;height:auto !important;}
   /* grow=0: 单标的(如核心资产)不再拉伸通栏, 与五列网格保持一致宽度 */
   .tile{flex:0 1 calc(20% - 2px);min-width:0;padding:4px 2px;}
   .tile .sb{font-size:8px;}
@@ -269,7 +269,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-29 13:34:05",
+  "generated_at": "2026-09-29 13:49:34",
   "selection_date": "2026-09-28",
   "quote_date": "2026-09-28",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -2128,7 +2128,7 @@ function loadRemoteData(){
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 function code6(c){ return String(c==null?'':c).slice(0,6); }
-function nameCode(nm, code){ return esc(nm)+'<br><span class="code num">'+code6(code)+'</span>'; }
+function nameCode(nm, code){ return esc(nm)+' <span class="code num">'+code6(code)+'</span>'; }
 function fp(v,d){ if(v==null||isNaN(v)) return '—'; return Number(v).toFixed(d==null?2:d); }
 function pct(v){ if(v==null||isNaN(v)) return '—'; return (v>0?'+':'')+fp(v,2)+'%'; }
 function cls(v){ return v==null?'flat':(v>0?'up':(v<0?'down':'flat')); }
