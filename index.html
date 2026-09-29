@@ -269,7 +269,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-09-29 15:16:58",
+  "generated_at": "2026-09-29 15:40:04",
   "selection_date": "2026-09-28",
   "quote_date": "2026-09-29",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -293,80 +293,80 @@
     "name": "天力锂能",
     "circ_mv": 14.7,
     "holder_comp": 0.18,
-    "close": null,
-    "pct_chg": null
+    "close": 22.49,
+    "pct_chg": 8.805
    },
    {
     "code": "600561",
     "name": "江西长运",
     "circ_mv": 16.7,
     "holder_comp": 0.3056,
-    "close": null,
-    "pct_chg": null
+    "close": 6.07,
+    "pct_chg": 3.2313
    },
    {
     "code": "002910",
     "name": "庄园牧场",
     "circ_mv": 16.9,
     "holder_comp": 0.2475,
-    "close": null,
-    "pct_chg": null
+    "close": 10.1,
+    "pct_chg": 2.4341
    },
    {
     "code": "300575",
     "name": "中旗股份",
     "circ_mv": 21.1,
     "holder_comp": 0.505,
-    "close": null,
-    "pct_chg": null
+    "close": 6.1,
+    "pct_chg": 0.3289
    },
    {
     "code": "603168",
     "name": "莎普爱思",
     "circ_mv": 22.0,
     "holder_comp": 0.22,
-    "close": null,
-    "pct_chg": null
+    "close": 6.04,
+    "pct_chg": 2.1997
    },
    {
     "code": "600774",
     "name": "汉商集团",
     "circ_mv": 22.4,
     "holder_comp": 0.4281,
-    "close": null,
-    "pct_chg": null
+    "close": 7.96,
+    "pct_chg": 2.4453
    },
    {
     "code": "300980",
     "name": "祥源新材",
     "circ_mv": 23.0,
     "holder_comp": 0.2825,
-    "close": null,
-    "pct_chg": null
+    "close": 22.9,
+    "pct_chg": -0.3481
    },
    {
     "code": "600854",
     "name": "春兰股份",
     "circ_mv": 24.6,
     "holder_comp": 0.3987,
-    "close": null,
-    "pct_chg": null
+    "close": 4.78,
+    "pct_chg": 0.8439
    },
    {
     "code": "603331",
     "name": "百达精工",
     "circ_mv": 24.9,
     "holder_comp": 0.0375,
-    "close": null,
-    "pct_chg": null
+    "close": 12.39,
+    "pct_chg": 0.7317
    },
    {
     "code": "002136",
     "name": "安纳达",
     "circ_mv": 24.9,
     "holder_comp": 0.1531,
-    "close": null,
-    "pct_chg": null
+    "close": 11.76,
+    "pct_chg": 1.2048
    }
   ],
   "pool_meta": {
@@ -528,8 +528,8 @@
     "pe": 13.5,
     "pe_ttm": 10.8,
     "dv_ttm": 6.82,
-    "close": null,
-    "pct_chg": null
+    "close": 335.96,
+    "pct_chg": -0.0208
    },
    {
     "code": "601318",
@@ -538,8 +538,8 @@
     "pe": 7.0,
     "pe_ttm": 6.0,
     "dv_ttm": 5.21,
-    "close": null,
-    "pct_chg": null
+    "close": 52.5,
+    "pct_chg": 0.1908
    },
    {
     "code": "605098",
@@ -548,8 +548,8 @@
     "pe": 19.8,
     "pe_ttm": 17.6,
     "dv_ttm": 5.07,
-    "close": null,
-    "pct_chg": null
+    "close": 52.47,
+    "pct_chg": -1.0933
    },
    {
     "code": "603998",
@@ -558,8 +558,8 @@
     "pe": 14.8,
     "pe_ttm": 13.6,
     "dv_ttm": 4.83,
-    "close": null,
-    "pct_chg": null
+    "close": 10.26,
+    "pct_chg": -0.9653
    },
    {
     "code": "603889",
@@ -568,8 +568,8 @@
     "pe": 11.8,
     "pe_ttm": 10.6,
     "dv_ttm": 4.52,
-    "close": null,
-    "pct_chg": null
+    "close": 5.97,
+    "pct_chg": 0.3361
    }
   ],
   "ret_1y": -0.5,
@@ -577,16 +577,16 @@
  },
  "strategy_scores": {
   "质量微盘": {
-   "5": -0.8326,
-   "10": 0.1627,
-   "15": -0.1137,
-   "20": -0.1822
+   "5": -0.1184,
+   "10": 0.4107,
+   "15": -0.048,
+   "20": -0.1389
   },
   "红利成长": {
-   "5": -0.739,
-   "10": -0.5534,
-   "15": -0.6275,
-   "20": -0.5611
+   "5": -0.7924,
+   "10": -0.5739,
+   "15": -0.6312,
+   "20": -0.6382
   },
   "核心资产": {
    "5": 0.0006,
@@ -2598,7 +2598,7 @@ function curData(){
 }
 /* 独立站点: 启动时后台拉取最新 dashboard_data.json, 成功后整体重渲染 */
 function loadRemoteData(){
-  fetch('dashboard_data.json',{cache:'no-cache'}).then(function(r){
+  fetch('dashboard_data.json?_='+Date.now(),{cache:'no-cache'}).then(function(r){
     if(!r.ok) throw new Error('http '+r.status);
     return r.json();
   }).then(function(j){
@@ -2606,6 +2606,8 @@ function loadRemoteData(){
       fetchedData=j;
       render(ensureView());
       var el=$('hd-meta'); if(el) el.title='已加载最新数据';
+      /* 新数据到达后补刷一次盘中行情: 打开页面时的首次刷新可能早于本文件到达，避免行情被旧快照覆盖 */
+      if(inSession()) refreshQuotes(false);
     }
   }).catch(function(){});
 }
