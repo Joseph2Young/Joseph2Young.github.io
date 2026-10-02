@@ -153,6 +153,27 @@
   .ln{fill:none;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round;}
   .s1{stroke:var(--up);} .s2{stroke:var(--s2);} .s3{stroke:var(--s3);} .s4{stroke:var(--s4);}
   .d1{fill:var(--up);} .d2{fill:var(--s2);} .d3{fill:var(--s3);} .d4{fill:var(--s4);}
+  .ln.dash{stroke-dasharray:3 3;stroke-width:1;}
+  .ln.sd{stroke:var(--down);}
+  .dd{fill:var(--down);}
+
+  /* ---------- 微盘择时 ---------- */
+  .mc-status{display:flex;align-items:baseline;gap:8px;margin-block-start:8px;flex-wrap:wrap;}
+  .mc-quad{font-size:12px;font-weight:500;line-height:17px;padding:1px 9px;border-radius:9px;}
+  .mc-quad.q-hot{background:color-mix(in srgb, var(--up) 16%, transparent);color:var(--up);}
+  .mc-quad.q-cold{background:color-mix(in srgb, var(--down) 15%, transparent);color:var(--down);}
+  .mc-quad.q-mid{background:var(--c-muted);color:var(--c-text2);}
+  .mc-quad.q-na{background:var(--c-muted);color:var(--c-text3);}
+  .mc-note{font-size:11px;color:var(--c-text3);line-height:17px;}
+  .mc-stats{display:grid;grid-template-columns:repeat(3,1fr);margin-block-start:8px;}
+  .mc-stats .cell{min-width:0;}
+  .mc-stats .cell + .cell{border-inline-start:1px solid var(--hairline);padding-inline-start:10px;}
+  .mc-stats .lab{font-size:10px;color:var(--c-text3);line-height:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mc-stats .val{font-size:17px;font-weight:500;line-height:21px;white-space:nowrap;}
+  .mc-stats .sub{font-size:10px;color:var(--c-text2);line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mc-legend{display:flex;gap:10px;font-size:10px;color:var(--c-text3);line-height:14px;margin-block-start:2px;}
+  .mc-th{font-size:10px;color:var(--c-text4);line-height:14px;}
+  h4.mc-h{margin:10px 0 3px;font-size:12px;font-weight:500;line-height:17px;}
 
   /* ---------- 动量条 ---------- */
   .mom{border-block-start:1px solid var(--hairline);margin-block-start:10px;padding-block-start:6px;}
@@ -251,6 +272,7 @@
     <button class="tab" role="tab" data-tab="map" aria-selected="true">资产地图</button>
     <button class="tab" role="tab" data-tab="detail" aria-selected="false">持仓明细</button>
     <button class="tab" role="tab" data-tab="trend" aria-selected="false">辅助走势</button>
+    <button class="tab" role="tab" data-tab="microcap" aria-selected="false">微盘择时</button>
   </div>
 
   <div id="view-map"><div class="mapwrap" id="map"></div><div class="legend" id="map-legend"></div></div>
@@ -259,6 +281,7 @@
     <div class="chart-legend" id="chart-legend"></div>
     <div id="chart" style="margin-block-start:4px"></div>
   </div>
+  <div id="view-microcap" style="display:none"></div>
 
   <div class="mom">
     <div class="mh"><span class="mt">子策略多周期动量得分</span><span class="hint">年化收益 × R²（对数回归），5/10/15/20 日；色块深浅=得分强度，角标=周期内排名</span></div>
@@ -269,7 +292,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-02 00:42:44",
+  "generated_at": "2026-10-02 17:10:20",
   "selection_date": "2026-09-30",
   "quote_date": "2026-09-30",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -594,6 +617,1019 @@
    "15": 0.1446,
    "20": 1.0759
   }
+ },
+ "microcap": {
+  "signal": {
+   "date": "2026-09-30",
+   "池换手率%": 2.5,
+   "量能分位%": 9.0,
+   "量能状态": "冰点",
+   "成交额MA10亿": 192.3,
+   "较近90日高点回撤%": 27.0,
+   "池指数": 2422.5,
+   "指数vsMA20": "上方",
+   "活跃分位%": 12.0,
+   "情绪分位%": 42.0,
+   "情绪非零分位%": 24.0,
+   "象限": "过渡带",
+   "涨停数_市场": 52,
+   "涨停数_微盘400": 3,
+   "涨停数_L1": 1,
+   "最高连板_市场": 6,
+   "最高连板_400": 3,
+   "最高连板_L1": 1,
+   "晋级率_400%": 0.0,
+   "打板溢价_400%": 1.43,
+   "炸板数_400": 4
+  },
+  "tier": {
+   "市场": {
+    "lu": 52,
+    "ld": 9,
+    "broken": 13,
+    "streak": 6,
+    "adv": 20.0,
+    "prem": 1.11
+   },
+   "微盘400": {
+    "lu": 3,
+    "ld": 0,
+    "broken": 4,
+    "streak": 3,
+    "adv": 0.0,
+    "prem": 1.43
+   },
+   "L1": {
+    "lu": 1,
+    "ld": 0,
+    "broken": 0,
+    "streak": 1,
+    "adv": null,
+    "prem": null
+   }
+  },
+  "trend": [
+   {
+    "date": "2026-04-09",
+    "turn": 2.79,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 4.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-10",
+    "turn": 2.59,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 24.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-13",
+    "turn": 2.58,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 13.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-14",
+    "turn": 2.71,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 13.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-15",
+    "turn": 2.66,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-16",
+    "turn": 2.94,
+    "amt_pct": null,
+    "lu400": 6,
+    "senti_pct": 75.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-17",
+    "turn": 2.77,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 13.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-20",
+    "turn": 2.71,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 24.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-21",
+    "turn": 2.69,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 13.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-22",
+    "turn": 2.6,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-23",
+    "turn": 2.97,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 24.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-24",
+    "turn": 3.06,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 66.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-27",
+    "turn": 3.63,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 40.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-28",
+    "turn": 3.45,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 40.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-29",
+    "turn": 3.67,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 54.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-04-30",
+    "turn": 3.66,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 66.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-06",
+    "turn": 4.02,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-07",
+    "turn": 3.43,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-08",
+    "turn": 3.18,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 54.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-11",
+    "turn": 3.46,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 54.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-12",
+    "turn": 3.09,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 24.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-13",
+    "turn": 2.93,
+    "amt_pct": null,
+    "lu400": 6,
+    "senti_pct": 76.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-14",
+    "turn": 2.97,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 66.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-15",
+    "turn": 3.08,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-18",
+    "turn": 3.13,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 25.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-19",
+    "turn": 2.78,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-20",
+    "turn": 2.54,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 25.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-21",
+    "turn": 3.29,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-22",
+    "turn": 2.89,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 41.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-25",
+    "turn": 3.11,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 41.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-26",
+    "turn": 2.95,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 25.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-27",
+    "turn": 2.9,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-28",
+    "turn": 2.72,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 25.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-05-29",
+    "turn": 2.92,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 25.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-01",
+    "turn": 3.19,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 67.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-02",
+    "turn": 2.75,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-03",
+    "turn": 2.46,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 26.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-04",
+    "turn": 2.33,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-05",
+    "turn": 2.77,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 41.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-08",
+    "turn": 2.75,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 41.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-09",
+    "turn": 2.45,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 41.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-10",
+    "turn": 2.43,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-11",
+    "turn": 2.18,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-12",
+    "turn": 2.43,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-15",
+    "turn": 2.69,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 26.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-16",
+    "turn": 2.56,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 67.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-17",
+    "turn": 2.55,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 67.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-18",
+    "turn": 2.59,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 67.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-22",
+    "turn": 3.08,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 55.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-23",
+    "turn": 3.04,
+    "amt_pct": null,
+    "lu400": 6,
+    "senti_pct": 77.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-24",
+    "turn": 2.98,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 14.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-25",
+    "turn": 2.62,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-26",
+    "turn": 2.6,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-29",
+    "turn": 3.02,
+    "amt_pct": null,
+    "lu400": 6,
+    "senti_pct": 77.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-06-30",
+    "turn": 2.64,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 55.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-01",
+    "turn": 3.36,
+    "amt_pct": null,
+    "lu400": 10,
+    "senti_pct": 94.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-02",
+    "turn": 3.12,
+    "amt_pct": null,
+    "lu400": 7,
+    "senti_pct": 83.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-03",
+    "turn": 3.15,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 55.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-06",
+    "turn": 2.7,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 42.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-07",
+    "turn": 2.53,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-08",
+    "turn": 2.12,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 26.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-09",
+    "turn": 2.31,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 26.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-10",
+    "turn": 2.99,
+    "amt_pct": null,
+    "lu400": 7,
+    "senti_pct": 83.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-13",
+    "turn": 2.7,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 26.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-14",
+    "turn": 2.61,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-15",
+    "turn": 2.57,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 42.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-16",
+    "turn": 2.57,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 42.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-17",
+    "turn": 3.05,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-20",
+    "turn": 3.58,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 26.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-21",
+    "turn": 3.95,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-22",
+    "turn": 2.6,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-23",
+    "turn": 2.65,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 56.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-24",
+    "turn": 2.09,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-27",
+    "turn": 2.4,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-28",
+    "turn": 2.33,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 27.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-29",
+    "turn": 2.68,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-30",
+    "turn": 2.77,
+    "amt_pct": null,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-07-31",
+    "turn": 2.82,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 68.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-03",
+    "turn": 2.87,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 56.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-04",
+    "turn": 2.75,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 56.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-05",
+    "turn": 2.53,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-06",
+    "turn": 2.67,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 27.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-07",
+    "turn": 2.46,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 16.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-10",
+    "turn": 2.93,
+    "amt_pct": null,
+    "lu400": 6,
+    "senti_pct": 77.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-11",
+    "turn": 2.39,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 27.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-12",
+    "turn": 2.16,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 43.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-13",
+    "turn": 2.36,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 27.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-14",
+    "turn": 2.19,
+    "amt_pct": null,
+    "lu400": 7,
+    "senti_pct": 84.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-17",
+    "turn": 2.52,
+    "amt_pct": null,
+    "lu400": 6,
+    "senti_pct": 77.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-18",
+    "turn": 2.48,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 68.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-19",
+    "turn": 2.74,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 56.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-20",
+    "turn": 2.57,
+    "amt_pct": null,
+    "lu400": 4,
+    "senti_pct": 56.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-21",
+    "turn": 2.35,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 27.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-24",
+    "turn": 2.49,
+    "amt_pct": null,
+    "lu400": 1,
+    "senti_pct": 15.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-25",
+    "turn": 2.77,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 68.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-26",
+    "turn": 2.3,
+    "amt_pct": null,
+    "lu400": 3,
+    "senti_pct": 43.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-27",
+    "turn": 2.22,
+    "amt_pct": null,
+    "lu400": 2,
+    "senti_pct": 27.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-28",
+    "turn": 2.58,
+    "amt_pct": null,
+    "lu400": 7,
+    "senti_pct": 84.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-08-31",
+    "turn": 3.15,
+    "amt_pct": null,
+    "lu400": 6,
+    "senti_pct": 78.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-09-01",
+    "turn": 3.06,
+    "amt_pct": null,
+    "lu400": 5,
+    "senti_pct": 68.0,
+    "quad": "数据不足"
+   },
+   {
+    "date": "2026-09-02",
+    "turn": 2.65,
+    "amt_pct": 21.0,
+    "lu400": 4,
+    "senti_pct": 56.0,
+    "quad": "过渡带"
+   },
+   {
+    "date": "2026-09-03",
+    "turn": 2.68,
+    "amt_pct": 23.0,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "双冷"
+   },
+   {
+    "date": "2026-09-04",
+    "turn": 2.89,
+    "amt_pct": 37.0,
+    "lu400": 5,
+    "senti_pct": 68.0,
+    "quad": "低活跃·高情绪"
+   },
+   {
+    "date": "2026-09-07",
+    "turn": 2.58,
+    "amt_pct": 17.0,
+    "lu400": 1,
+    "senti_pct": 16.0,
+    "quad": "双冷"
+   },
+   {
+    "date": "2026-09-08",
+    "turn": 2.75,
+    "amt_pct": 28.0,
+    "lu400": 4,
+    "senti_pct": 56.0,
+    "quad": "过渡带"
+   },
+   {
+    "date": "2026-09-09",
+    "turn": 2.58,
+    "amt_pct": 16.0,
+    "lu400": 2,
+    "senti_pct": 27.0,
+    "quad": "双冷"
+   },
+   {
+    "date": "2026-09-10",
+    "turn": 2.43,
+    "amt_pct": 10.0,
+    "lu400": 0,
+    "senti_pct": 5.0,
+    "quad": "双冷"
+   },
+   {
+    "date": "2026-09-11",
+    "turn": 2.89,
+    "amt_pct": 36.0,
+    "lu400": 2,
+    "senti_pct": 28.0,
+    "quad": "双冷"
+   },
+   {
+    "date": "2026-09-14",
+    "turn": 2.47,
+    "amt_pct": 11.0,
+    "lu400": 5,
+    "senti_pct": 68.0,
+    "quad": "低活跃·高情绪"
+   },
+   {
+    "date": "2026-09-15",
+    "turn": 2.5,
+    "amt_pct": 12.0,
+    "lu400": 1,
+    "senti_pct": 16.0,
+    "quad": "双冷"
+   },
+   {
+    "date": "2026-09-16",
+    "turn": 2.3,
+    "amt_pct": 5.0,
+    "lu400": 6,
+    "senti_pct": 78.0,
+    "quad": "低活跃·高情绪"
+   },
+   {
+    "date": "2026-09-17",
+    "turn": 2.41,
+    "amt_pct": 9.0,
+    "lu400": 2,
+    "senti_pct": 28.0,
+    "quad": "双冷"
+   },
+   {
+    "date": "2026-09-18",
+    "turn": 2.42,
+    "amt_pct": 9.0,
+    "lu400": 3,
+    "senti_pct": 43.0,
+    "quad": "过渡带"
+   },
+   {
+    "date": "2026-09-21",
+    "turn": 2.89,
+    "amt_pct": 36.0,
+    "lu400": 6,
+    "senti_pct": 78.0,
+    "quad": "低活跃·高情绪"
+   },
+   {
+    "date": "2026-09-22",
+    "turn": 2.92,
+    "amt_pct": 38.0,
+    "lu400": 1,
+    "senti_pct": 16.0,
+    "quad": "双冷"
+   },
+   {
+    "date": "2026-09-23",
+    "turn": 2.51,
+    "amt_pct": 13.0,
+    "lu400": 3,
+    "senti_pct": 42.0,
+    "quad": "过渡带"
+   },
+   {
+    "date": "2026-09-24",
+    "turn": 2.42,
+    "amt_pct": 9.0,
+    "lu400": 4,
+    "senti_pct": 56.0,
+    "quad": "过渡带"
+   },
+   {
+    "date": "2026-09-28",
+    "turn": 2.58,
+    "amt_pct": 17.0,
+    "lu400": 3,
+    "senti_pct": 42.0,
+    "quad": "过渡带"
+   },
+   {
+    "date": "2026-09-29",
+    "turn": 2.6,
+    "amt_pct": 19.0,
+    "lu400": 5,
+    "senti_pct": 68.0,
+    "quad": "低活跃·高情绪"
+   },
+   {
+    "date": "2026-09-30",
+    "turn": 2.5,
+    "amt_pct": 12.0,
+    "lu400": 3,
+    "senti_pct": 42.0,
+    "quad": "过渡带"
+   }
+  ]
  },
  "portfolio": {
   "weights": {
@@ -2695,6 +3731,7 @@ function render(d){
   renderDetail(d);
   renderChart(d);
   renderMomentum(d);
+  renderMicrocap(d);
 }
 
 function renderKpi(d){
@@ -2918,6 +3955,92 @@ function renderMomentum(d){
   $('mom-body').innerHTML=h+'</div>';
 }
 
+/* ---------------- 微盘择时 ---------------- */
+var QUAD_CLS={'双热':'q-hot','双冷':'q-cold','低活跃·高情绪':'q-hot','高活跃·低情绪':'q-cold',
+  '过渡带':'q-mid','数据不足':'q-na'};
+function quadCls(q){ return QUAD_CLS[q]||'q-na'; }
+
+function renderMicrocap(d){
+  var box=$('view-microcap'); if(!box) return;
+  var mc=d.microcap;
+  if(!mc || !mc.signal){ box.innerHTML='<div class="mc-note" style="margin-block-start:10px">微盘择时数据不足</div>'; return; }
+  var sig=mc.signal, tier=mc.tier||{}, trend=mc.trend||[];
+
+  var h='<div class="mc-status">'
+    +'<span class="mc-quad '+quadCls(sig['象限'])+'">'+esc(sig['象限'])+'</span>'
+    +'<span class="mc-note">'+esc(sig['date'])+' · 量能'+esc(sig['量能状态'])
+    +' · 涨停 '+sig['涨停数_市场']+'/'+sig['涨停数_微盘400']+'/'+sig['涨停数_L1']+'（市场/400/L1）</span></div>';
+
+  h+='<div class="mc-stats">'
+    +mcCell('池换手率', (sig['池换手率%']==null?'—':fp(sig['池换手率%'],2)+'%'), '', '成交额MA10 '+fp(sig['成交额MA10亿'],0)+'亿 · 90日高点回撤 '+(sig['较近90日高点回撤%']==null?'—':fp(sig['较近90日高点回撤%'],0)+'%'))
+    +mcCell('活跃分位', (sig['活跃分位%']==null?'—':fp(sig['活跃分位%'],0)), pctCls(sig['活跃分位%']), '池换手率 750日分位 · 高≥60 低<40')
+    +mcCell('情绪分位', (sig['情绪分位%']==null?'—':fp(sig['情绪分位%'],0)), pctCls(sig['情绪分位%']), '池内涨停数 750日分位 · 非零口径 '+(sig['情绪非零分位%']==null?'—':fp(sig['情绪非零分位%'],0)))
+    +'</div>';
+
+  h+='<div class="mc-legend"><span><span class="up">—</span> 活跃分位</span><span><span class="down">—</span> 情绪分位</span><span class="mc-th">虚线 60/40 阈值 · 近'+trend.length+'日</span></div>';
+  h+='<div id="mc-chart"></div>';
+
+  h+='<h4 class="mc-h">三档情绪对照 · '+esc(sig['date'])+'</h4><table class="dtable">'
+    +'<tr><th>档位</th><th>涨停</th><th>跌停</th><th>炸板</th><th>最高连板</th><th>晋级率</th><th>打板溢价</th></tr>';
+  ['市场','微盘400','L1'].forEach(function(k){
+    var t=tier[k]; if(!t){ return; }
+    h+=tblRow([esc(k), t.lu, t.ld, t.broken, t.streak,
+      (t.adv==null?'—':fp(t.adv,0)+'%'),
+      (t.prem==null?'—':'<span class="'+(t.prem>0?'up':(t.prem<0?'down':'flat'))+'">'+fp(t.prem,2)+'%</span>')]);
+  });
+  h+='</table>';
+
+  if(trend.length){
+    h+='<h4 class="mc-h">近 '+Math.min(20,trend.length)+' 日两轴轨迹</h4><table class="dtable">'
+      +'<tr><th>日期</th><th>池换手率</th><th>活跃分位</th><th>池内涨停</th><th>情绪分位</th><th>象限</th></tr>';
+    trend.slice(-20).reverse().forEach(function(r){
+      h+=tblRow([r.date, fp(r.turn,2)+'%', fp(r.amt_pct,0), r.lu400, fp(r.senti_pct,0),
+        '<span class="mc-quad '+quadCls(r.quad)+'" style="font-size:10px;line-height:14px;padding:0 6px">'+esc(r.quad)+'</span>']);
+    });
+    h+='</table>';
+  }
+  box.innerHTML=h;
+  drawMicroChart(trend);
+}
+function mcCell(lab,val,vcls,sub){
+  return '<div class="cell"><div class="lab">'+esc(lab)+'</div>'
+    +'<div class="val num '+vcls+'">'+esc(val)+'</div>'
+    +'<div class="sub num">'+esc(sub)+'</div></div>';
+}
+function pctCls(v){ return v==null?'flat':(v>=60?'up':(v<40?'down':'flat')); }
+function drawMicroChart(trend){
+  var box=$('mc-chart'); if(!box) return;
+  if(!trend || trend.length<2){ box.innerHTML=''; return; }
+  var W=box.clientWidth||660, H=170, PL=26, PR=8, PT=8, PB=16;
+  function X(i){ return PL+i/(trend.length-1)*(W-PL-PR); }
+  function Y(v){ return PT+(100-v)/100*(H-PT-PB); }
+  var grid='', xlab='';
+  [0,20,40,60,80,100].forEach(function(g){
+    grid+='<line class="gridl" x1="'+PL+'" y1="'+Y(g)+'" x2="'+(W-PR)+'" y2="'+Y(g)+'"/>'
+      +'<text class="axis" x="'+(PL-4)+'" y="'+(Y(g)+3)+'" text-anchor="end">'+g+'</text>';
+  });
+  [40,60].forEach(function(g){
+    grid+='<line class="gridl" x1="'+PL+'" y1="'+Y(g)+'" x2="'+(W-PR)+'" y2="'+Y(g)+'" style="stroke:var(--c-text4);stroke-dasharray:3 3"/>';
+  });
+  xlab+='<text class="axis" x="'+PL+'" y="'+(H-4)+'" text-anchor="start">'+trend[0].date.slice(0,7)+'</text>'
+    +'<text class="axis" x="'+(W-PR)+'" y="'+(H-4)+'" text-anchor="end">'+trend[trend.length-1].date.slice(0,7)+'</text>';
+  function line(key, cls){
+    var pts=[];
+    trend.forEach(function(r,i){ if(r[key]!=null) pts.push(X(i).toFixed(1)+','+Y(r[key]).toFixed(1)); });
+    return pts.length>1?'<polyline class="ln '+cls+'" points="'+pts.join(' ')+'"/>':'';
+  }
+  var dots='';
+  ['amt_pct','senti_pct'].forEach(function(key, k){
+    for(var i=trend.length-1;i>=0;i--){
+      var v=trend[i][key]; if(v==null) continue;
+      dots+='<circle class="'+(k===0?'d1':'dd')+'" cx="'+X(i)+'" cy="'+Y(v)+'" r="2.5"/>';
+      break;
+    }
+  });
+  box.innerHTML='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+grid+xlab
+    +line('amt_pct','s1')+line('senti_pct','sd')+dots+'</svg>';
+}
+
 /* ---------------- 交互 ---------------- */
 function bind(){
   var tabs=$('tabs'); if(!tabs) return;
@@ -2930,7 +4053,9 @@ function bind(){
     $('view-map').style.display=state.tab==='map'?'':'none';
     $('view-detail').style.display=state.tab==='detail'?'':'none';
     $('view-trend').style.display=state.tab==='trend'?'':'none';
+    $('view-microcap').style.display=state.tab==='microcap'?'':'none';
     if(state.tab==='trend'){ renderChart(ensureView()); }
+    if(state.tab==='microcap'){ renderMicrocap(ensureView()); }
   });
 }
 
@@ -2956,7 +4081,7 @@ try{
     host.onDataChange(function(){ render(ensureView()); });
   }
   if(host && typeof host.onThemeChange==='function'){ host.onThemeChange(function(){ render(ensureView()); }); }
-  window.addEventListener('resize',function(){ var d=ensureView(); if(state.tab==='trend')renderChart(d); });
+  window.addEventListener('resize',function(){ var d=ensureView(); if(state.tab==='trend')renderChart(d); if(state.tab==='microcap')renderMicrocap(d); });
 }catch(e){ /* 渲染异常时保持静态内容 */ }
 })();
 </script>
