@@ -306,7 +306,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-09 16:46:59",
+  "generated_at": "2026-10-09 17:46:38",
   "selection_date": "2026-10-08",
   "quote_date": "2026-10-09",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -3866,20 +3866,28 @@ function avgPct(list){
   return n? s/n : null;
 }
 function renderKpi(d){
-  /* 当前持仓篮子今日收益: 微盘10只/红利5只等权, 核心资产按腿权重, 总策略三等分加权 */
+  /* 当前持仓篮子今日收益: 微盘10只/红利5只等权, 核心资产按腿权重(pool兜底涨跌幅) */
   var r1=avgPct(d.b1&&d.b1.holdings);
   var r2=avgPct(d.dividend&&d.dividend.holdings);
   var r3=null;
   var tg=(d.etf&&d.etf.targets)||[];
   if(tg.length){
+    var pool={}; ((d.etf&&d.etf.pool)||[]).forEach(function(x){ pool[String(x.code)]=x; });
     var s=0, any=false;
-    tg.forEach(function(x){ if(isFinite(x.pct_chg)){ s+=x.weight*x.pct_chg; any=true; } });
+    tg.forEach(function(x){
+      var pc=isFinite(x.pct_chg)?x.pct_chg:((pool[x.code]&&isFinite(pool[x.code].pct_chg))?pool[x.code].pct_chg:NaN);
+      if(isFinite(pc)){ s+=x.weight*pc; any=true; }
+    });
     r3= any? s : null;
   }
-  var parts=[r1,r2,r3].filter(function(v){ return v!=null; });
-  var total= parts.length? parts.reduce(function(a,b){return a+b;},0)/parts.length : null;
+  /* 总策略当日收益 = Σ 子策略涨幅 × 持仓占比(4×25%动量轮动仓位, 未配置部分为现金收益0) */
+  var alloc=computeAlloc(d.strategy_scores||{});
+  var rs={'质量微盘':r1,'红利成长':r2,'核心资产':r3};
+  var total=0;
+  STRATS.forEach(function(sname){ var r=rs[sname]; if(r!=null) total += r * alloc[sname] * 25 / 100; });
+  total=Math.round(total*100)/100;
   var cells=[
-    {lab:'总策略今日', val:total, sub:'三等分加权·当前持仓'},
+    {lab:'总策略今日', val:total, sub:'按4×25%动量仓位加权'},
     {lab:'质量微盘', val:r1, sub:'当前持仓等权'},
     {lab:'红利成长', val:r2, sub:'当前持仓等权'},
     {lab:'核心资产', val:r3, sub:'当前持仓按腿权重'}
