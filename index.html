@@ -222,9 +222,11 @@
   .head .t{font-size:15px;}
   .linkbtn{font-size:12px;padding:4px 10px;}
 
-  /* KPI 首屏: 单列内容自适应, 避免挤压截断 */
-  .kpi{grid-auto-columns:max-content;}
-  .kpi .cell{padding-inline:0;padding-block:2px;}
+  /* KPI 首屏: 4列 -> 2×2 网格, 避免挤压截断 */
+  .kpi{grid-template-columns:1fr 1fr;}
+  .kpi .cell{padding-inline:8px;padding-block:2px;}
+  .kpi .cell:nth-child(3){border-inline-start:none;padding-inline-start:0;}
+  .kpi .cell:nth-child(n+3){border-block-start:1px solid var(--hairline);}
   .kpi .val{font-size:15px;line-height:18px;}
   .kpi .sub{font-size:9px;}
 
@@ -293,7 +295,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-09 13:30:47",
+  "generated_at": "2026-10-09 13:30:41",
   "selection_date": "2026-10-08",
   "quote_date": "2026-10-08",
   "source": "Tushare(主) / Wind 万得(备)",
