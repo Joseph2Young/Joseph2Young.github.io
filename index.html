@@ -306,7 +306,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-09 16:14:58",
+  "generated_at": "2026-10-09 16:46:59",
   "selection_date": "2026-10-08",
   "quote_date": "2026-10-09",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -3953,6 +3953,8 @@ function renderMap(d){
   var H = 264, headH = 16, gap = 6;
   var bodyH = H - (headH+gap)*3;
   var hB = Math.round(bodyH*0.50), hD = Math.round(bodyH*0.30), hC = Math.max(bodyH - hB - hD, 30);
+  /* 仓位与下方多周期动量区同一套 4×25% 规则 */
+  var alloc = computeAlloc(d.strategy_scores||{});
 
   var b1 = d.b1.holdings||[];
   var b1Tiles = b1.map(function(x){
@@ -3984,13 +3986,13 @@ function renderMap(d){
     +'</div>';
 
   var html = ''
-    + band('质量微盘', '10只 · 一年 '+pct(d.b1.ret_1y)+' · 配置 62.5%', hB, b1Tiles)
-    + band('红利成长', dv.length+'只 · 一年 '+pct(d.dividend.ret_1y)+' · 配置 31.25%', hD, dvTiles)
-    + band('核心资产 · '+(tgtNames||'空仓'), '25日动量', hC, coreTile);
+    + band('质量微盘', '仓位 '+alloc['质量微盘']*25+'%', hB, b1Tiles)
+    + band('红利成长', '仓位 '+alloc['红利成长']*25+'%', hD, dvTiles)
+    + band('核心资产 · '+(tgtNames||'空仓'), '25日动量 · 仓位 '+alloc['核心资产']*25+'%', hC, coreTile);
 
   wrap.innerHTML=html;
   $('map-legend').innerHTML='<span><span class="up">●</span> 上涨</span><span><span class="down">●</span> 下跌</span>'
-    +'<span class="lg-full">条带高度=配置权重 · 组内等宽=成分股 · 颜色=今日涨跌</span>'
+    +'<span class="lg-full">组内等宽=成分股 · 颜色=今日涨跌 · 仓位=4×25%动量轮动</span>'
     +'<span class="lg-brief">颜色=今日涨跌</span>';
 }
 
@@ -4110,20 +4112,25 @@ function drawChart(series){
   box.innerHTML='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+grid+xlab+paths+dots+'</svg>';
 }
 
-function renderMomentum(d){
-  var ss=d.strategy_scores||{};
-  var WS=['5','10','15','20'];
-  var mx=0;
-  STRATS.forEach(function(s){ WS.forEach(function(w){ var v=ss[s]&&ss[s][w]; if(v!=null) mx=Math.max(mx,Math.abs(v)); }); });
-  if(!mx) mx=1;
-  /* 仓位占比: 每个周期排名第一的子策略获得一份25%仓位 */
-  var alloc={}, acl={'质量微盘':'a1','红利成长':'a2','核心资产':'a3'};
-  STRATS.forEach(function(s){ alloc[s]=0; });
-  WS.forEach(function(w){
+/* 4×25%轮动仓位: 每个动量周期(5/10/15/20日)排名第一的子策略获得一份25%仓位 */
+var MOM_WS=['5','10','15','20'];
+function computeAlloc(ss){
+  var alloc={}; STRATS.forEach(function(s){ alloc[s]=0; });
+  MOM_WS.forEach(function(w){
     var best=null, bv=-Infinity;
     STRATS.forEach(function(s){ var v=ss[s]?ss[s][w]:null; if(v!=null && v>bv){ bv=v; best=s; } });
     if(best) alloc[best]++;
   });
+  return alloc;
+}
+function renderMomentum(d){
+  var ss=d.strategy_scores||{};
+  var WS=MOM_WS;
+  var mx=0;
+  STRATS.forEach(function(s){ WS.forEach(function(w){ var v=ss[s]&&ss[s][w]; if(v!=null) mx=Math.max(mx,Math.abs(v)); }); });
+  if(!mx) mx=1;
+  /* 仓位占比: 与资产地图区同一套 4×25% 规则 */
+  var alloc=computeAlloc(ss), acl={'质量微盘':'a1','红利成长':'a2','核心资产':'a3'};
   var ah='<div class="alloc"><div class="alloc-title">仓位占比 · 每周期动量第一得一份 25%</div>';
   STRATS.forEach(function(s){
     var segs='';
