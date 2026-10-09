@@ -85,7 +85,7 @@
   .panel p{font-size:11px;color:var(--c-text2);line-height:18px;margin:0 0 4px;}
 
   /* ---------- KPI 首屏 ---------- */
-  .kpi{display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr;margin-block-start:6px;}
+  .kpi{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;justify-content:start;margin-block-start:6px;}
   .kpi .cell{padding-inline:10px;min-width:0;}
   .kpi .cell + .cell{border-inline-start:1px solid var(--hairline);}
   .kpi .cell:first-child{padding-inline-start:0;}
@@ -222,11 +222,9 @@
   .head .t{font-size:15px;}
   .linkbtn{font-size:12px;padding:4px 10px;}
 
-  /* KPI 首屏: 4列 -> 2×2 网格, 避免挤压截断 */
-  .kpi{grid-template-columns:1fr 1fr;}
-  .kpi .cell{padding-inline:8px;padding-block:2px;}
-  .kpi .cell:nth-child(3){border-inline-start:none;padding-inline-start:0;}
-  .kpi .cell:nth-child(n+3){border-block-start:1px solid var(--hairline);}
+  /* KPI 首屏: 单列内容自适应, 避免挤压截断 */
+  .kpi{grid-auto-columns:max-content;}
+  .kpi .cell{padding-inline:0;padding-block:2px;}
   .kpi .val{font-size:15px;line-height:18px;}
   .kpi .sub{font-size:9px;}
 
@@ -295,7 +293,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-09 00:48:23",
+  "generated_at": "2026-10-09 13:30:47",
   "selection_date": "2026-10-08",
   "quote_date": "2026-10-08",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -3714,22 +3712,14 @@ function render(d){
 }
 
 function renderKpi(d){
-  var p=d.portfolio||{}, r=p.ret_1y||{}, c=p.contributions||{}, w=p.weights||{};
-  var cells=[
-    {lab:'组合一年收益', val:pct(p.ret_1y_combined), vcls:cls(p.ret_1y_combined), sub:'按初始资金加权'},
-    {lab:'质量微盘', val:pct(r['质量微盘']), vcls:cls(r['质量微盘']), sub:'配置'+fp(w['质量微盘'],1)+'%·贡献'+fmtContrib(c['质量微盘'])},
-    {lab:'红利成长', val:pct(r['红利成长']), vcls:cls(r['红利成长']), sub:'配置'+fp(w['红利成长'],1)+'%·贡献'+fmtContrib(c['红利成长'])},
-    {lab:'核心资产', val:pct(r['核心资产']), vcls:cls(r['核心资产']), sub:'配置'+fp(w['核心资产'],1)+'%·贡献'+fmtContrib(c['核心资产'])}
-  ];
-  $('kpi').innerHTML=cells.map(function(c){
-    return '<div class="cell">'
-      +'<div class="lab">'+esc(c.lab)+'</div>'
-      +'<div class="val num '+c.vcls+'">'+esc(c.val)+'</div>'
-      +'<div class="sub num">'+esc(c.sub)+'</div>'
-      +'</div>';
-  }).join('');
+  var p=d.portfolio||{}, r=p.ret_1y||{};
+  var v=r['核心资产'];
+  $('kpi').innerHTML='<div class="cell">'
+    +'<div class="lab">核心资产近一年</div>'
+    +'<div class="val num '+cls(v)+'">'+pct(v)+'</div>'
+    +'<div class="sub num">策略逐日回放·无费率</div>'
+    +'</div>';
 }
-function fmtContrib(v){ return v==null?'—':((v>0?'+':'')+fp(v,2)+'pct'); }
 function fmtScore(v){ if(v==null||isNaN(v)) return '—'; if(Math.abs(v)<0.005) return '0.00'; return (v>0?'+':'')+Number(v).toFixed(2); }
 
 function band(label, metaText, hpx, tilesHtml){
