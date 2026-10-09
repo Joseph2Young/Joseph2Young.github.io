@@ -193,6 +193,16 @@
   .mg-val{font-size:12px;font-weight:500;line-height:15px;}
   .mg-none{color:var(--c-text4);background:var(--c-muted);}
   .mg-rank{position:absolute;top:1px;left:4px;font-size:8px;line-height:10px;color:var(--c-text3);font-weight:400;}
+
+  /* 仓位占比(4×25%轮动: 每个动量周期排名第一的子策略获得一份25%仓位) */
+  .alloc{margin-block-start:6px;display:grid;gap:3px;}
+  .alloc-title{font-size:10px;line-height:14px;color:var(--c-text3);}
+  .alloc-row{display:grid;grid-template-columns:60px 1fr 38px;align-items:center;gap:8px;}
+  .alloc-lab{font-size:11px;line-height:15px;color:var(--c-text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .alloc-bar{display:flex;gap:2px;height:10px;}
+  .alloc-seg{flex:1;border-radius:2px;background:var(--c-muted);}
+  .alloc-seg.on.a1{background:var(--up);} .alloc-seg.on.a2{background:var(--s2);} .alloc-seg.on.a3{background:var(--s3);}
+  .alloc-pct{font-size:11px;line-height:15px;text-align:end;color:var(--c-text);}
 </style>
 <style>
 /* 响应式适配: 由 build.py 在构建时注入 <head> 尾部(置于模板样式之后, 覆盖生效)
@@ -222,9 +232,11 @@
   .head .t{font-size:15px;}
   .linkbtn{font-size:12px;padding:4px 10px;}
 
-  /* KPI 首屏: 单列内容自适应, 避免挤压截断 */
-  .kpi{grid-auto-columns:max-content;}
-  .kpi .cell{padding-inline:0;padding-block:2px;}
+  /* KPI 首屏: 4列 -> 2×2 网格, 避免挤压截断 */
+  .kpi{grid-template-columns:1fr 1fr;}
+  .kpi .cell{padding-inline:8px;padding-block:2px;}
+  .kpi .cell:nth-child(3){border-inline-start:none;padding-inline-start:0;}
+  .kpi .cell:nth-child(n+3){border-block-start:1px solid var(--hairline);}
   .kpi .val{font-size:15px;line-height:18px;}
   .kpi .sub{font-size:9px;}
 
@@ -285,7 +297,7 @@
   <div id="view-microcap" style="display:none"></div>
 
   <div class="mom">
-    <div class="mh"><span class="mt">子策略多周期动量得分</span><span class="hint">年化收益 × R²（对数回归），5/10/15/20 日；色块深浅=得分强度，角标=周期内排名</span></div>
+    <div class="mh"><span class="mt">子策略多周期动量与仓位</span><span class="hint">年化收益 × R²（对数回归），5/10/15/20 日；色块深浅=得分强度，角标=周期内排名；每周期排名第一获得一份 25% 仓位</span></div>
     <div id="mom-body"></div>
   </div>
 </div>
@@ -293,7 +305,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-09 13:53:59",
+  "generated_at": "2026-10-09 14:36:22",
   "selection_date": "2026-10-08",
   "quote_date": "2026-10-08",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -3929,8 +3941,25 @@ function renderMomentum(d){
   var mx=0;
   STRATS.forEach(function(s){ WS.forEach(function(w){ var v=ss[s]&&ss[s][w]; if(v!=null) mx=Math.max(mx,Math.abs(v)); }); });
   if(!mx) mx=1;
+  /* 仓位占比: 每个周期排名第一的子策略获得一份25%仓位 */
+  var alloc={}, acl={'质量微盘':'a1','红利成长':'a2','核心资产':'a3'};
+  STRATS.forEach(function(s){ alloc[s]=0; });
+  WS.forEach(function(w){
+    var best=null, bv=-Infinity;
+    STRATS.forEach(function(s){ var v=ss[s]?ss[s][w]:null; if(v!=null && v>bv){ bv=v; best=s; } });
+    if(best) alloc[best]++;
+  });
+  var ah='<div class="alloc"><div class="alloc-title">仓位占比 · 每周期动量第一得一份 25%</div>';
+  STRATS.forEach(function(s){
+    var segs='';
+    for(var i=0;i<4;i++) segs+='<span class="alloc-seg'+(i<alloc[s]?' on '+acl[s]:'')+'"></span>';
+    ah+='<div class="alloc-row"><span class="alloc-lab">'+s+'</span>'
+      +'<span class="alloc-bar">'+segs+'</span>'
+      +'<span class="alloc-pct num">'+alloc[s]*25+'%</span></div>';
+  });
+  ah+='</div>';
   /* 按列布局: 每列一个周期, 列内色块按得分降序(位置即排名), null 垫底 */
-  var h='<div class="momgrid">';
+  var h=ah+'<div class="momgrid">';
   WS.forEach(function(w){
     var arr=STRATS.map(function(s){ return {s:s, v:ss[s]?ss[s][w]:null}; })
       .sort(function(a,b){ return (b.v==null?-1e9:b.v)-(a.v==null?-1e9:a.v); });
