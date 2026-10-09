@@ -85,7 +85,7 @@
   .panel p{font-size:11px;color:var(--c-text2);line-height:18px;margin:0 0 4px;}
 
   /* ---------- KPI 首屏 ---------- */
-  .kpi{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;justify-content:start;margin-block-start:6px;}
+  .kpi{display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr;margin-block-start:6px;}
   .kpi .cell{padding-inline:10px;min-width:0;}
   .kpi .cell + .cell{border-inline-start:1px solid var(--hairline);}
   .kpi .cell:first-child{padding-inline-start:0;}
@@ -295,7 +295,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-09 13:30:41",
+  "generated_at": "2026-10-09 13:54:01",
   "selection_date": "2026-10-08",
   "quote_date": "2026-10-08",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -3713,14 +3713,37 @@ function render(d){
   renderMicrocap(d);
 }
 
+function avgPct(list){
+  var s=0,n=0;
+  (list||[]).forEach(function(x){ if(x&&isFinite(x.pct_chg)){ s+=x.pct_chg; n++; } });
+  return n? s/n : null;
+}
 function renderKpi(d){
-  var p=d.portfolio||{}, r=p.ret_1y||{};
-  var v=r['核心资产'];
-  $('kpi').innerHTML='<div class="cell">'
-    +'<div class="lab">核心资产近一年</div>'
-    +'<div class="val num '+cls(v)+'">'+pct(v)+'</div>'
-    +'<div class="sub num">策略逐日回放·无费率</div>'
-    +'</div>';
+  /* 当前持仓篮子今日收益: 微盘10只/红利5只等权, 核心资产按腿权重, 总策略三等分加权 */
+  var r1=avgPct(d.b1&&d.b1.holdings);
+  var r2=avgPct(d.dividend&&d.dividend.holdings);
+  var r3=null;
+  var tg=(d.etf&&d.etf.targets)||[];
+  if(tg.length){
+    var s=0, any=false;
+    tg.forEach(function(x){ if(isFinite(x.pct_chg)){ s+=x.weight*x.pct_chg; any=true; } });
+    r3= any? s : null;
+  }
+  var parts=[r1,r2,r3].filter(function(v){ return v!=null; });
+  var total= parts.length? parts.reduce(function(a,b){return a+b;},0)/parts.length : null;
+  var cells=[
+    {lab:'总策略今日', val:total, sub:'三等分加权·当前持仓'},
+    {lab:'质量微盘', val:r1, sub:'当前持仓等权'},
+    {lab:'红利成长', val:r2, sub:'当前持仓等权'},
+    {lab:'核心资产', val:r3, sub:'当前持仓按腿权重'}
+  ];
+  $('kpi').innerHTML=cells.map(function(c){
+    return '<div class="cell">'
+      +'<div class="lab">'+esc(c.lab)+'</div>'
+      +'<div class="val num '+cls(c.val)+'">'+pct(c.val)+'</div>'
+      +'<div class="sub num">'+esc(c.sub)+'</div>'
+      +'</div>';
+  }).join('');
 }
 function fmtScore(v){ if(v==null||isNaN(v)) return '—'; if(Math.abs(v)<0.005) return '0.00'; return (v>0?'+':'')+Number(v).toFixed(2); }
 
