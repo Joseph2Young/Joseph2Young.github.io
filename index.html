@@ -298,7 +298,7 @@
   <div id="view-microcap" style="display:none"></div>
 
   <div class="mom">
-    <div class="mh"><span class="mt">子策略多周期动量与仓位</span><span class="hint">年化收益 × R²（对数回归），5/10/15/20 日；色块深浅=得分强度，角标=周期内排名；每周期排名第一获得一份 25% 仓位</span></div>
+    <div class="mh"><span class="mt">子策略多周期动量与仓位</span><span class="hint">5/10/15/20 日 · 得分=年化×R²</span></div>
     <div id="mom-body"></div>
   </div>
 </div>
@@ -306,7 +306,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-10 00:27:14",
+  "generated_at": "2026-10-10 00:43:33",
   "selection_date": "2026-10-09",
   "quote_date": "2026-10-09",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -327,7 +327,7 @@
     "code": "600561",
     "name": "江西长运",
     "circ_mv": 17.2,
-    "holder_comp": 0.2888,
+    "holder_comp": 0.2919,
     "close": 6.06,
     "pct_chg": -0.4926
    },
@@ -335,9 +335,17 @@
     "code": "002910",
     "name": "庄园牧场",
     "circ_mv": 17.8,
-    "holder_comp": 0.23,
+    "holder_comp": 0.2331,
     "close": 10.42,
     "pct_chg": 1.0669
+   },
+   {
+    "code": "300165",
+    "name": "天瑞仪器",
+    "circ_mv": 20.9,
+    "holder_comp": 0.1444,
+    "close": 4.98,
+    "pct_chg": 0.2012
    },
    {
     "code": "300575",
@@ -351,7 +359,7 @@
     "code": "300980",
     "name": "祥源新材",
     "circ_mv": 22.1,
-    "holder_comp": 0.2656,
+    "holder_comp": 0.2706,
     "close": 15.97,
     "pct_chg": 0.1882
    },
@@ -359,7 +367,7 @@
     "code": "603168",
     "name": "莎普爱思",
     "circ_mv": 22.5,
-    "holder_comp": 0.2025,
+    "holder_comp": 0.2075,
     "close": 6.04,
     "pct_chg": 1.5126
    },
@@ -375,7 +383,7 @@
     "code": "600854",
     "name": "春兰股份",
     "circ_mv": 24.7,
-    "holder_comp": 0.3862,
+    "holder_comp": 0.3881,
     "close": 4.76,
     "pct_chg": 0.4219
    },
@@ -394,14 +402,6 @@
     "holder_comp": 0.0587,
     "close": 3.9,
     "pct_chg": 1.2987
-   },
-   {
-    "code": "603839",
-    "name": "安正时尚",
-    "circ_mv": 26.4,
-    "holder_comp": 0.4487,
-    "close": 6.83,
-    "pct_chg": 0.4412
    }
   ],
   "pool_meta": {
@@ -737,10 +737,10 @@
  },
  "strategy_scores": {
   "质量微盘": {
-   "5": -0.4455,
-   "10": -0.221,
-   "15": 0.0012,
-   "20": -0.049
+   "5": -0.4127,
+   "10": -0.2803,
+   "15": 0.0,
+   "20": -0.078
   },
   "红利成长": {
    "5": 1.3227,
@@ -2457,7 +2457,8 @@ function band(label, metaText, hpx, tilesHtml){
 function tileHtml(nm, sb, pc, extra){
   var tcls = pc==null ? 't-flat' : (pc>0?'t-up':(pc<0?'t-down':'t-flat'));
   if(extra) tcls=extra;
-  return '<div class="tile '+tcls+'">'
+  var tip = nm + (sb?' '+sb:'') + (pc!=null?(' '+(pc>0?'+':'')+pc.toFixed(2)+'%'):'');
+  return '<div class="tile '+tcls+'" title="'+esc(tip)+'">'
     +'<div class="nm">'+esc(nm)+'</div>'
     +(sb?'<div class="sb num">'+esc(sb)+'</div>':'')
     +(pc!=null?'<div class="pc num '+cls(pc)+'">'+pct(pc)+'</div>':'')
@@ -2644,7 +2645,7 @@ function renderMomentum(d){
   if(!mx) mx=1;
   /* 仓位占比: 与资产地图区同一套 4×25% 规则 */
   var alloc=computeAlloc(ss), acl={'质量微盘':'a1','红利成长':'a2','核心资产':'a3'};
-  var ah='<div class="alloc"><div class="alloc-title">仓位占比 · 每周期动量第一得一份 25%</div>';
+  var ah='<div class="alloc"><div class="alloc-title">仓位占比（4×25%）</div>';
   STRATS.forEach(function(s){
     var segs='';
     for(var i=0;i<4;i++) segs+='<span class="alloc-seg'+(i<alloc[s]?' on '+acl[s]:'')+'"></span>';
