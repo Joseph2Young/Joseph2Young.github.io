@@ -21,6 +21,7 @@
     --s2: #3ba272;
     --s3: #8a5cd6;
     --s4: #aaa;
+    --chg: #c47f17;
   }
   html[data-theme="dark"]{
     --up: #e06c75;
@@ -35,6 +36,7 @@
     --s2: #4fbd8d;
     --s3: #a37ee8;
     --s4: #5f5f66;
+    --chg: #e6a23c;
   }
   @media (prefers-color-scheme: dark){
     html:not([data-theme="light"]):not([data-theme="dark"]){
@@ -50,6 +52,7 @@
       --s2: #4fbd8d;
       --s3: #a37ee8;
       --s4: #5f5f66;
+      --chg: #e6a23c;
     }
   }
   html,body{margin:0;padding:0;background:var(--c-bg);}
@@ -107,7 +110,7 @@
   .bandhead .bn{font-size:11px;font-weight:500;color:var(--c-text);line-height:16px;white-space:nowrap;}
   .bandhead .bm{font-size:10px;color:var(--c-text3);line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .bandbody{display:flex;gap:2px;border-radius:4px;overflow:hidden;}
-  .tile{border-radius:4px;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;box-sizing:border-box;}
+  .tile{border-radius:4px;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;box-sizing:border-box;position:relative;}
   .tile .nm{font-size:11px;line-height:14px;color:var(--c-text);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .tile .sb{font-size:9px;line-height:12px;color:var(--c-text3);max-width:100%;overflow:hidden;white-space:nowrap;}
   .code{font-size:9px;color:var(--c-text3);line-height:12px;}
@@ -117,6 +120,10 @@
   .tile.t-row .nm{flex:0 1 auto;}
   .t-up{background:color-mix(in srgb, var(--up) 13%, var(--c-muted));}
   .t-down{background:color-mix(in srgb, var(--down) 12%, var(--c-muted));}
+  /* 较上日变动: 新进角标 + 带内退出名单 */
+  .tile .bdg{position:absolute;top:1px;right:2px;font-size:8px;line-height:1;padding:1px 3px;border-radius:3px;background:var(--chg);color:#fff;z-index:1;}
+  .bandchg{font-size:9px;line-height:12px;color:var(--chg);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bandchg b{font-weight:500;}
   .t-flat{background:var(--c-muted);}
   .t-core{background:color-mix(in srgb, var(--s3) 14%, var(--c-muted));}
   /* 窄屏(手机): 条带改等宽网格(每行5格), 免横滑, 各组格子大小一致 */
@@ -308,7 +315,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-10 17:32:14",
+  "generated_at": "2026-10-10 17:32:16",
   "selection_date": "2026-10-09",
   "quote_date": "2026-10-09",
   "basis": {
@@ -3558,45 +3565,64 @@ function recomputeCoreLive(d){
   tr.live=true;
 }
 
-function band(label, metaText, hpx, tilesHtml){
+function band(label, metaText, hpx, tilesHtml, footHtml){
   return '<div class="band">'
     +'<div class="bandhead"><span class="bn">'+label+'</span><span class="bm">'+metaText+'</span></div>'
     +'<div class="bandbody" style="height:'+hpx+'px">'+tilesHtml+'</div>'
+    +(footHtml||'')
     +'</div>';
 }
-function tileHtml(nm, sb, pc, extra){
+function tileHtml(nm, sb, pc, extra, isNew){
   var tcls = pc==null ? 't-flat' : (pc>0?'t-up':(pc<0?'t-down':'t-flat'));
   if(extra) tcls=extra;
   var tip = nm + (sb?' '+sb:'') + (pc!=null?(' '+(pc>0?'+':'')+pc.toFixed(2)+'%'):'');
   return '<div class="tile '+tcls+'" title="'+esc(tip)+'">'
+    +(isNew?'<div class="bdg">新</div>':'')
     +'<div class="nm">'+esc(nm)+'</div>'
     +(sb?'<div class="sb num">'+esc(sb)+'</div>':'')
     +(pc!=null?'<div class="pc num '+cls(pc)+'">'+pct(pc)+'</div>':'')
     +'</div>';
 }
+/* 较上日变动行: 新进计数 + 退出名单(超3只折叠) */
+function chgFoot(changes){
+  if(!changes) return '';
+  var n = changes.new ? changes.new.length : 0;
+  var outNames = (changes.exited||[]).map(function(x){return x.name;});
+  if(!n && !outNames.length) return '';
+  var parts = [];
+  if(n) parts.push('新进 <b>'+n+'</b>');
+  if(outNames.length) parts.push('退出 '+(outNames.length>3 ? outNames.slice(0,3).join('、')+' 等'+outNames.length+'只' : outNames.join('、')));
+  return '<div class="bandchg">'+parts.join(' · ')+'</div>';
+}
 
 function renderMap(d){
   var wrap=$('map'); if(!wrap) return;
   var H = 264, headH = 16, gap = 6;
-  var bodyH = H - (headH+gap)*3;
+  /* 有退出名单的条带预留变动行高度, 避免格子被压缩裁切 */
+  var chgB = (d.b1&&d.b1.changes&&(d.b1.changes.exited||[]).length)?1:0;
+  var chgD = (d.dividend&&d.dividend.changes&&(d.dividend.changes.exited||[]).length)?1:0;
+  var chgC = (d.etf&&d.etf.changes&&(d.etf.changes.exited||[]).length)?1:0;
+  var footH = 14, footGap = 2;
+  var bodyH = H - (headH+gap)*3 - (chgB+chgD+chgC)*(footH+footGap);
   var hB = Math.round(bodyH*0.44), hD = Math.round(bodyH*0.28), hC = Math.max(bodyH - hB - hD, 48);
   /* 仓位与下方多周期动量区同一套 4×25% 规则 */
   var alloc = computeAlloc(d.strategy_scores||{});
 
   var b1 = d.b1.holdings||[];
   var b1Tiles = b1.map(function(x){
-    return tileHtml(x.name, code6(x.code), x.pct_chg);
+    return tileHtml(x.name, code6(x.code), x.pct_chg, null, x.is_new);
   }).join('');
 
   var dv = d.dividend.holdings||[];
   var dvTiles = dv.map(function(x){
-    return tileHtml(x.name, code6(x.code), x.pct_chg);
+    return tileHtml(x.name, code6(x.code), x.pct_chg, null, x.is_new);
   }).join('');
 
   var etf = d.etf||{};
   var pool = etf.pool||[];
   var tgtNames = (etf.targets||[]).map(function(t){return t.name;}).join('/');
   var tgtCodes = (etf.targets||[]).map(function(t){return code6(t.code);}).join('/');
+  var tgtNew = (etf.targets||[]).some(function(t){return t.is_new;});
   var corePct = null;
   if((etf.targets||[]).length){
     var sum = etf.targets.reduce(function(s,t){
@@ -3606,12 +3632,14 @@ function renderMap(d){
     corePct = Math.round(sum*100)/100;
   }
   /* 与其他子策略一致的竖排格子; 空仓时无涨跌数字 */
-  var coreTile = tileHtml(tgtNames||'持有现金', tgtCodes||null, corePct);
+  var coreTile = tileHtml(tgtNames||'持有现金', tgtCodes||null, corePct, null, tgtNew);
 
+  var basis = (d.meta && d.meta.basis) || {};
+  var bd = function(k){ return basis[k] ? ' · 名单' + basis[k].slice(5).replace('-', '/') : ''; };
   var html = ''
-    + band('质量微盘', '仓位 '+alloc['质量微盘']*25+'%', hB, b1Tiles)
-    + band('红利成长', '仓位 '+alloc['红利成长']*25+'%', hD, dvTiles)
-    + band('核心资产', '25日动量 · 仓位 '+alloc['核心资产']*25+'%', hC, coreTile);
+    + band('质量微盘', '仓位 '+alloc['质量微盘']*25+'%'+bd('micro'), hB, b1Tiles, chgFoot(d.b1&&d.b1.changes))
+    + band('红利成长', '仓位 '+alloc['红利成长']*25+'%'+bd('dividend'), hD, dvTiles, chgFoot(d.dividend&&d.dividend.changes))
+    + band('核心资产', '25日动量 · 仓位 '+alloc['核心资产']*25+'%'+bd('core'), hC, coreTile, chgFoot(etf.changes));
 
   wrap.innerHTML=html;
   $('map-legend').innerHTML='<span><span class="up">●</span> 上涨</span><span><span class="down">●</span> 下跌</span>'
