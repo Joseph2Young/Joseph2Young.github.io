@@ -306,7 +306,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-10 00:43:34",
+  "generated_at": "2026-10-10 09:26:41",
   "selection_date": "2026-10-09",
   "quote_date": "2026-10-09",
   "source": "Tushare(主) / Wind 万得(备)",
@@ -2298,7 +2298,7 @@ function cls(v){ return v==null?'flat':(v>0?'up':(v<0?'down':'flat')); }
 function pctHtml(v){ return '<span class="'+cls(v)+' num">'+pct(v)+'</span>'; }
 function scoreCls(v){ return v==null?'flat':(v>0?'up':(v<0?'down':'flat')); }
 var STRATS=['质量微盘','红利成长','核心资产'];
-var state={tab:'map', legend:{'核心资产':true}};
+var state={tab:'map', legend:{'质量微盘':true,'红利成长':true,'核心资产':true}};
 
 /* ---------------- 盘中行情刷新(仅页面打开时运行; 15分钟定时+手动按钮) ----------------
    数据源: 腾讯行情公开接口(qt.gtimg.cn, 允许跨域); 仅刷新 close/pct_chg, 持仓名单不变 */
@@ -2469,7 +2469,7 @@ function renderMap(d){
   var wrap=$('map'); if(!wrap) return;
   var H = 264, headH = 16, gap = 6;
   var bodyH = H - (headH+gap)*3;
-  var hB = Math.round(bodyH*0.50), hD = Math.round(bodyH*0.30), hC = Math.max(bodyH - hB - hD, 30);
+  var hB = Math.round(bodyH*0.44), hD = Math.round(bodyH*0.28), hC = Math.max(bodyH - hB - hD, 48);
   /* 仓位与下方多周期动量区同一套 4×25% 规则 */
   var alloc = computeAlloc(d.strategy_scores||{});
 
@@ -2495,17 +2495,13 @@ function renderMap(d){
     }, 0);
     corePct = Math.round(sum*100)/100;
   }
-  /* 单标的横排一行: 矮条带内容不溢出; 空仓时无涨跌数字 */
-  var coreTile = '<div class="tile t-core t-row">'
-    +'<span class="nm">'+esc(tgtNames||'持有现金')+'</span>'
-    +(tgtCodes?'<span class="code num">'+esc(tgtCodes)+'</span>':'')
-    +(corePct!=null?'<span class="pc num '+cls(corePct)+'">'+pct(corePct)+'</span>':'')
-    +'</div>';
+  /* 与其他子策略一致的竖排格子; 空仓时无涨跌数字 */
+  var coreTile = tileHtml(tgtNames||'持有现金', tgtCodes||null, corePct);
 
   var html = ''
     + band('质量微盘', '仓位 '+alloc['质量微盘']*25+'%', hB, b1Tiles)
     + band('红利成长', '仓位 '+alloc['红利成长']*25+'%', hD, dvTiles)
-    + band('核心资产 · '+(tgtNames||'空仓'), '25日动量 · 仓位 '+alloc['核心资产']*25+'%', hC, coreTile);
+    + band('核心资产', '25日动量 · 仓位 '+alloc['核心资产']*25+'%', hC, coreTile);
 
   wrap.innerHTML=html;
   $('map-legend').innerHTML='<span><span class="up">●</span> 上涨</span><span><span class="down">●</span> 下跌</span>'
@@ -2572,6 +2568,8 @@ function coreSignalText(etf){
 function renderChart(d){
   var t=d.trends||{};
   var series=[
+    {name:'质量微盘',dates:t.dates_micro,nav:t.nav_micro,cls:'s1',dot:'d1'},
+    {name:'红利成长',dates:t.dates_div,nav:t.nav_div,cls:'s2',dot:'d2'},
     {name:'核心资产',dates:t.dates_core,nav:t.nav_core,cls:'s3',dot:'d3'}
   ];
   var leg=$('chart-legend');
