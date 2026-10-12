@@ -315,7 +315,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-12 11:27:33",
+  "generated_at": "2026-10-12 11:27:25",
   "selection_date": "2026-10-09",
   "quote_date": "2026-10-09",
   "basis": {
@@ -3312,6 +3312,7 @@ function refreshQuotes(manual){
     }); }
     upd(d.b1.holdings); upd(d.dividend&&d.dividend.holdings);
     upd(d.etf&&d.etf.targets); upd(d.etf&&d.etf.pool);
+    recomputeCoreLive(d);
     render(d);
     var n=new Date(), hh=('0'+n.getHours()).slice(-2), mm=('0'+n.getMinutes()).slice(-2);
     setQuoteStatus('已刷新 '+hh+':'+mm);
@@ -3377,6 +3378,44 @@ function renderKpi(d){
   }).join('');
 }
 function fmtScore(v){ if(v==null||isNaN(v)) return '—'; if(Math.abs(v)<0.005) return '0.00'; return (v>0?'+':'')+Number(v).toFixed(2); }
+
+/* 对数回归动量(与 fetch_data.momentum_detail 同口径): 年化=exp(slope)^250-1, 得分=年化×R² */
+function momentumCalc(closes){
+  var ys=[], i;
+  for(i=0;i<closes.length;i++){ var c=closes[i]; if(!isFinite(c)||c<=0) return null; ys.push(Math.log(c)); }
+  var n=ys.length; if(n<2) return null;
+  var sx=0,sy=0,sxy=0,sxx=0;
+  for(i=0;i<n;i++){ sx+=i; sy+=ys[i]; sxy+=i*ys[i]; sxx+=i*i; }
+  var slope=(n*sxy-sx*sy)/(n*sxx-sx*sx);
+  var intercept=(sy-slope*sx)/n, ssRes=0, ssTot=0, mean=sy/n;
+  for(i=0;i<n;i++){ var f=slope*i+intercept; ssRes+=(ys[i]-f)*(ys[i]-f); ssTot+=(ys[i]-mean)*(ys[i]-mean); }
+  var r2=ssTot>0?1-ssRes/ssTot:0;
+  var annualized=Math.pow(Math.exp(slope),250)-1;
+  return {annualized:annualized, r2:r2, score:annualized*r2};
+}
+/* 盘中: 用实时价作为25日动量窗口末点重算得分与排名(对齐聚宽24日线+盘中分钟线) */
+function recomputeCoreLive(d){
+  var etf=d.etf; if(!etf) return;
+  var tr=etf.tracks&&etf.tracks['25日动量'], mc=etf.mom_closes;
+  if(!tr||!mc||!tr.detail) return;
+  var pool={}; (etf.pool||[]).forEach(function(x){ pool[String(x.code)]=x; });
+  var best=null, bs=-Infinity;
+  Object.keys(tr.detail).forEach(function(code){
+    var base=mc[code], q=pool[code];
+    if(!base||base.length<2||!q||!isFinite(q.close)) return;
+    var m=momentumCalc(base.concat([q.close]));
+    if(!m) return;
+    var dd=tr.detail[code];
+    dd.annualized=m.annualized; dd.r2=m.r2; dd.score=m.score; dd.pass=false;
+    if(m.score>bs){ bs=m.score; best=code; }
+  });
+  if(best){
+    tr.detail[best].pass=true;
+    if(best==='510300'){ tr.pick=null; tr.pick_name=null; tr.note='沪深300居首(空仓信号)·盘中'; }
+    else { tr.pick=best; tr.pick_name=tr.detail[best].name; tr.note=(tr.live?'':'')||null; }
+  }
+  tr.live=true;
+}
 
 function band(label, metaText, hpx, tilesHtml, footHtml){
   return '<div class="band">'
@@ -3452,7 +3491,7 @@ function renderMap(d){
   var html = ''
     + band('质量微盘', '仓位 '+alloc['质量微盘']*25+'%'+bd('micro'), hB, b1Tiles, chgFoot(d.b1&&d.b1.changes))
     + band('红利成长', '仓位 '+alloc['红利成长']*25+'%'+bd('dividend'), hD, dvTiles, chgFoot(d.dividend&&d.dividend.changes))
-    + band('核心资产', '22日动量 · 仓位 '+alloc['核心资产']*25+'%'+bd('core'), hC, coreTile, chgFoot(etf.changes));
+    + band('核心资产', '25日动量 · 仓位 '+alloc['核心资产']*25+'%'+bd('core'), hC, coreTile, chgFoot(etf.changes));
 
   wrap.innerHTML=html;
   $('map-legend').innerHTML='<span><span class="up">●</span> 上涨</span><span><span class="down">●</span> 下跌</span>'
@@ -3472,8 +3511,8 @@ function renderDetail(d){
   b1.forEach(function(x){ h+=tblRow([nameCode(x.name,x.code),fp(x.circ_mv,1),(x.holder_comp==null?'—':fp(x.holder_comp,3)),pctHtml(x.pct_chg)]); });
   h+='</table></div><div><h4>红利成长</h4><table class="dtable"><tr><th>名称</th><th>PB</th><th>PE</th><th>股息率</th><th>涨跌幅</th></tr>';
   (d.dividend.holdings||[]).forEach(function(x){ h+=tblRow([nameCode(x.name,x.code),fp(x.pb,2),fp(x.pe,1),(x.dv_ttm==null?'—':fp(x.dv_ttm,2)+'%'),pctHtml(x.pct_chg)]); });
-  h+='</table></div><div><h4>核心资产 · 22日动量 <span class="rt">'+coreTargetText(d.etf)+'</span></h4>';
-  h+=trackTable(d.etf, '22日动量');
+  h+='</table></div><div><h4>核心资产 · 25日动量 <span class="rt">'+coreTargetText(d.etf)+'</span></h4>';
+  h+=trackTable(d.etf, '25日动量');
   h+='<div class="signal">'+coreSignalText(d.etf)+'</div></div>';
   $('view-detail').innerHTML='<div class="detail">'+h+'</div>';
 }
