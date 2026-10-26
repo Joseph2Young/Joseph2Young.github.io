@@ -195,18 +195,23 @@
   .mom .hint{font-size:10px;color:var(--c-text4);}
 
   /* 动量热力色块图(按列): 每列一个周期, 列内色块按得分降序, 色块深浅=|得分|相对强度 */
-  .momgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-block-start:4px;}
-  .mg-col{display:grid;gap:3px;grid-template-rows:16px repeat(3,40px);}
-  .mg-cell{border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;}
+  .momgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;margin-block-start:4px;}
+  .mg-col{display:grid;gap:3px;grid-template-rows:16px 32px repeat(3,40px);min-width:0;}
+  .mg-cell{border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;min-width:0;overflow:hidden;}
   .mg-head{height:16px;line-height:16px;font-size:10px;font-weight:400;color:var(--c-text3);}
   .mg-name{font-size:10px;line-height:13px;color:var(--c-text2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-inline:2px;}
   .mg-val{font-size:12px;font-weight:500;line-height:15px;}
   .mg-none{color:var(--c-text4);background:var(--c-muted);}
+  .mg-slot{gap:1px;padding-inline:2px;font-size:9px;line-height:12px;color:var(--c-text2);background:var(--c-muted);box-sizing:border-box;}
+  .mg-slot span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mg-owner{font-weight:500;color:var(--c-text);}
+  .mg-challenger{font-size:8px;color:var(--c-text3);}
   .mg-rank{position:absolute;top:1px;left:4px;font-size:8px;line-height:10px;color:var(--c-text3);font-weight:400;}
 
   /* 仓位占比(4×25%轮动: 每个动量周期排名第一的子策略获得一份25%仓位) */
   .alloc{margin-block-start:6px;display:grid;gap:3px;}
   .alloc-title{font-size:10px;line-height:14px;color:var(--c-text3);}
+  .alloc-note{font-size:10px;line-height:14px;color:var(--c-text3);overflow-wrap:anywhere;}
   .alloc-row{display:grid;grid-template-columns:60px 1fr 38px;align-items:center;gap:8px;}
   .alloc-lab{font-size:11px;line-height:15px;color:var(--c-text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .alloc-bar{display:flex;gap:2px;height:10px;}
@@ -315,7 +320,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-26 12:05:47",
+  "generated_at": "2026-10-26 13:46:57",
   "selection_date": "2026-10-23",
   "quote_date": "2026-10-23",
   "basis": {
@@ -426,22 +431,12 @@
     "holder_comp": 0.4387,
     "close": 6.07,
     "pct_chg": 0.6633,
-    "is_new": true
+    "is_new": false
    }
   ],
   "changes": {
-   "new": [
-    {
-     "code": "603839",
-     "name": "安正时尚"
-    }
-   ],
-   "exited": [
-    {
-     "code": "603331",
-     "name": "百达精工"
-    }
-   ]
+   "new": [],
+   "exited": []
   },
   "pool_meta": {
    "periods": [
@@ -3634,6 +3629,12 @@ function renderMomentum(d){
       +'<span class="alloc-bar">'+segs+'</span>'
       +'<span class="alloc-pct num">'+Math.round(alloc[s]*100)+'%</span></div>';
   });
+  var notes=[];
+  WS.forEach(function(w){
+    var slot=(d.rotation&&d.rotation.slots||{})[w]||{};
+    if(slot.note && notes.indexOf(slot.note)<0) notes.push(slot.note);
+  });
+  if(notes.length) ah+='<div class="alloc-note">'+esc(notes.join('；'))+'</div>';
   ah+='</div>';
   /* 按列布局: 每列一个周期, 列内色块按得分降序(位置即排名), null 垫底 */
   var h=ah+'<div class="momgrid">';
@@ -3641,9 +3642,12 @@ function renderMomentum(d){
     var arr=STRATS.map(function(s){ return {s:s, v:ss[s]?ss[s][w]:null}; })
       .sort(function(a,b){ return (b.v==null?-1e9:b.v)-(a.v==null?-1e9:a.v); });
     var slot=(d.rotation&&d.rotation.slots||{})[w]||{};
-    var slotText='S'+(slotIndex+1)+' · 持有 '+(slot.owner||'—')+' · '+(slot.note||'轮动数据缺失');
+    var owner=slot.owner||'—', challenger=slot.challenger||'—';
+    var slotText='S'+(slotIndex+1)+' · 持有 '+owner+' · '+(slot.note||'轮动数据缺失');
     h+='<div class="mg-col"><div class="mg-cell mg-head">'+w+'日</div>'
-      +'<div class="mg-cell mg-none">'+esc(slotText)+'</div>';
+      +'<div class="mg-cell mg-slot" title="'+esc(slotText)+'">'
+      +'<span class="mg-owner">S'+(slotIndex+1)+' · '+esc(owner)+'</span>'
+      +'<span class="mg-challenger">冠军 · '+esc(challenger)+'</span></div>';
     arr.forEach(function(o,i){
       if(o.v==null){ h+='<div class="mg-cell mg-none">—</div>'; return; }
       var a=Math.min(Math.abs(o.v)/mx,1);
