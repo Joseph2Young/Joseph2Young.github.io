@@ -218,6 +218,48 @@
   .alloc-seg{flex:1;border-radius:2px;background:var(--c-muted);}
   .alloc-seg.on.a1{background:var(--up);} .alloc-seg.on.a2{background:var(--s2);} .alloc-seg.on.a3{background:var(--s3);}
   .alloc-pct{font-size:11px;line-height:15px;text-align:end;color:var(--c-text);}
+
+  /* ---------- 微立体卡片: 仅在悬停/按压时变换, 无持续渲染 ---------- */
+  .bandbody,.momgrid{perspective:760px;}
+  .tile,.mg-cell:not(.mg-head){
+    --rx:0deg;--ry:0deg;--lift:0px;
+    transform:perspective(760px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift));
+    transform-style:preserve-3d;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -2px 0 rgba(0,0,0,.07),0 2px 2px rgba(0,0,0,.07);
+    transition:transform 150ms ease,box-shadow 150ms ease,filter 150ms ease;
+  }
+  button.tile{border:0;font:inherit;text-align:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  button.tile:focus-visible,.security-link:focus-visible{outline:2px solid var(--c-text2);outline-offset:2px;}
+  .tile.is-tilting,.mg-cell.is-tilting{--lift:-1px;box-shadow:inset 0 1px 0 rgba(255,255,255,.48),inset 0 -2px 0 rgba(0,0,0,.06),0 4px 7px rgba(0,0,0,.11);}
+  .tile:active,.mg-cell:active{--lift:1px;box-shadow:inset 0 2px 3px rgba(0,0,0,.10),0 1px 1px rgba(0,0,0,.05);}
+  html[data-theme="dark"] .tile,html[data-theme="dark"] .mg-cell:not(.mg-head){box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -2px 0 rgba(0,0,0,.24),0 2px 2px rgba(0,0,0,.20);}
+
+  /* ---------- 标的信息弹层 ---------- */
+  .security-popover{position:fixed;z-index:30;width:min(312px,calc(100vw - 24px));box-sizing:border-box;padding:12px 14px 13px;border:1px solid var(--hairline);border-radius:14px;background:var(--c-bg);color:var(--c-text);box-shadow:0 14px 38px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.28);}
+  .security-popover[hidden]{display:none;}
+  .security-popover.is-opening{animation:security-in 140ms ease-out;}
+  .security-head{display:flex;align-items:flex-start;gap:10px;padding-block-end:8px;border-block-end:1px solid var(--hairline);}
+  .security-title{min-width:0;flex:1;}
+  .security-title strong{display:block;font-size:15px;line-height:21px;font-weight:600;}
+  .security-title span{display:block;margin-block-start:1px;font-size:10px;line-height:15px;color:var(--c-text3);}
+  .security-close{flex:0 0 28px;width:28px;height:28px;border-radius:50%;font-size:18px;line-height:28px;text-align:center;color:var(--c-text2);}
+  .security-close:hover{background:var(--c-muted);}
+  .security-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 14px;margin-block-start:10px;}
+  .security-item{min-width:0;}
+  .security-item.wide{grid-column:1/-1;}
+  .security-item .lab{display:block;font-size:10px;line-height:14px;color:var(--c-text3);}
+  .security-item .val{display:block;margin-block-start:1px;font-size:13px;line-height:19px;font-weight:500;overflow-wrap:anywhere;}
+  .security-date{margin-block-start:10px;font-size:9px;line-height:14px;color:var(--c-text3);}
+  .security-link{font:inherit;color:inherit;text-align:start;white-space:normal;}
+  .security-link:hover{text-decoration:underline;text-underline-offset:3px;}
+  @keyframes security-in{from{opacity:0;transform:translateY(7px) scale(.985);}to{opacity:1;transform:translateY(0) scale(1);}}
+  @media (max-width:560px){
+    .security-popover{left:12px !important;right:12px;bottom:max(12px,env(safe-area-inset-bottom));top:auto !important;width:auto;max-height:70vh;overflow:auto;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .tile,.mg-cell:not(.mg-head){transform:none !important;transition:none;}
+    .security-popover.is-opening{animation:none;}
+  }
 </style>
 <style>
 /* 响应式适配: 由 build.py 在构建时注入 <head> 尾部(置于模板样式之后, 覆盖生效)
@@ -296,6 +338,15 @@
 
   <div class="kpi" id="kpi"></div>
 
+  <aside class="security-popover" id="security-popover" role="dialog" aria-modal="false" aria-labelledby="security-name" hidden>
+    <div class="security-head">
+      <div class="security-title"><strong id="security-name"></strong><span id="security-subtitle"></span></div>
+      <button type="button" class="security-close" id="security-close" aria-label="关闭标的信息">×</button>
+    </div>
+    <div class="security-grid" id="security-grid"></div>
+    <div class="security-date" id="security-date"></div>
+  </aside>
+
   <div class="tabs" role="tablist" id="tabs">
     <button class="tab" role="tab" data-tab="map" aria-selected="true">资产地图</button>
     <button class="tab" role="tab" data-tab="detail" aria-selected="false">持仓明细</button>
@@ -320,13 +371,13 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-10-27 23:29:51",
-  "selection_date": "2026-10-26",
+  "generated_at": "2026-10-28 12:55:04",
+  "selection_date": "2026-10-27",
   "quote_date": "2026-10-27",
   "basis": {
    "micro": "2026-10-23",
    "dividend": "2026-09-30",
-   "core": "2026-10-26"
+   "core": "2026-10-27"
   },
   "source": "Tushare(主) / Wind 万得(备)",
   "backup_used": [],
@@ -350,6 +401,8 @@
     "holder_comp": 0.1775,
     "close": 19.24,
     "pct_chg": -5.1282,
+    "sw_l1": "电力设备",
+    "sw_l2": "电池",
     "is_new": false
    },
    {
@@ -359,6 +412,8 @@
     "holder_comp": 0.2975,
     "close": 5.34,
     "pct_chg": -4.9822,
+    "sw_l1": "交通运输",
+    "sw_l2": "铁路公路",
     "is_new": false
    },
    {
@@ -368,6 +423,8 @@
     "holder_comp": 0.2394,
     "close": 9.03,
     "pct_chg": -2.2727,
+    "sw_l1": "食品饮料",
+    "sw_l2": "饮料乳品",
     "is_new": false
    },
    {
@@ -377,6 +434,8 @@
     "holder_comp": 0.1506,
     "close": 4.7,
     "pct_chg": -1.8789,
+    "sw_l1": "机械设备",
+    "sw_l2": "通用设备",
     "is_new": false
    },
    {
@@ -386,6 +445,8 @@
     "holder_comp": 0.4888,
     "close": 5.28,
     "pct_chg": -4.8649,
+    "sw_l1": "基础化工",
+    "sw_l2": "农化制品",
     "is_new": false
    },
    {
@@ -395,6 +456,8 @@
     "holder_comp": 0.4088,
     "close": 7.04,
     "pct_chg": -4.3478,
+    "sw_l1": "医药生物",
+    "sw_l2": "化学制药",
     "is_new": false
    },
    {
@@ -404,6 +467,8 @@
     "holder_comp": 0.2206,
     "close": 5.45,
     "pct_chg": -4.8866,
+    "sw_l1": "医药生物",
+    "sw_l2": "化学制药",
     "is_new": false
    },
    {
@@ -413,6 +478,8 @@
     "holder_comp": 0.1456,
     "close": 10.25,
     "pct_chg": -3.2106,
+    "sw_l1": "基础化工",
+    "sw_l2": "化学原料",
     "is_new": false
    },
    {
@@ -422,6 +489,8 @@
     "holder_comp": 0.3937,
     "close": 4.35,
     "pct_chg": -3.118,
+    "sw_l1": "家用电器",
+    "sw_l2": "白色家电",
     "is_new": false
    },
    {
@@ -431,6 +500,8 @@
     "holder_comp": 0.4387,
     "close": 5.9,
     "pct_chg": -4.685,
+    "sw_l1": "纺织服饰",
+    "sw_l2": "服装家纺",
     "is_new": false
    }
   ],
@@ -508,6 +579,7 @@
     "weight": 1.0,
     "close": 1.924,
     "pct_chg": 0.84,
+    "premium_pct": 0.8756,
     "is_new": false
    }
   ],
@@ -523,42 +595,48 @@
     "name": "黄金ETF",
     "close": 8.167,
     "pct_chg": -0.22,
-    "open": 8.184
+    "open": 8.184,
+    "premium_pct": -0.1211
    },
    {
     "code": "513100",
     "name": "纳指100",
     "close": 2.249,
     "pct_chg": 0.58,
-    "open": 2.264
+    "open": 2.264,
+    "premium_pct": null
    },
    {
     "code": "159915",
     "name": "创业板",
     "close": 2.563,
     "pct_chg": -3.32,
-    "open": 2.678
+    "open": 2.678,
+    "premium_pct": -0.0741
    },
    {
     "code": "510300",
     "name": "沪深300",
     "close": 4.123,
     "pct_chg": -1.34,
-    "open": 4.186
+    "open": 4.186,
+    "premium_pct": -0.0703
    },
    {
     "code": "159981",
     "name": "能源化工",
     "close": 1.924,
     "pct_chg": 0.84,
-    "open": 1.896
+    "open": 1.896,
+    "premium_pct": 0.8756
    },
    {
     "code": "513130",
     "name": "恒生科技",
     "close": 0.467,
     "pct_chg": -1.68,
-    "open": 0.477
+    "open": 0.477,
+    "premium_pct": -0.8703
    }
   ]
  },
@@ -573,6 +651,8 @@
     "dv_ttm": 6.74,
     "close": 328.69,
     "pct_chg": -0.9672,
+    "sw_l1": "传媒",
+    "sw_l2": "游戏Ⅱ",
     "is_new": false
    },
    {
@@ -584,6 +664,8 @@
     "dv_ttm": 5.12,
     "close": 52.61,
     "pct_chg": -0.019,
+    "sw_l1": "非银金融",
+    "sw_l2": "保险Ⅱ",
     "is_new": false
    },
    {
@@ -595,6 +677,8 @@
     "dv_ttm": 5.09,
     "close": 52.01,
     "pct_chg": -2.2552,
+    "sw_l1": "社会服务",
+    "sw_l2": "教育",
     "is_new": false
    },
    {
@@ -606,6 +690,8 @@
     "dv_ttm": 4.83,
     "close": 10.39,
     "pct_chg": -1.9811,
+    "sw_l1": "医药生物",
+    "sw_l2": "中药Ⅱ",
     "is_new": false
    },
    {
@@ -617,6 +703,8 @@
     "dv_ttm": 4.56,
     "close": 37.06,
     "pct_chg": -2.4737,
+    "sw_l1": "通信",
+    "sw_l2": "通信设备",
     "is_new": false
    }
   ],
@@ -3292,6 +3380,10 @@ function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 function code6(c){ return String(c==null?'':c).slice(0,6); }
 function nameCode(nm, code){ return esc(nm)+' <span class="code num">'+code6(code)+'</span>'; }
+function securityLink(strategy, nm, code){
+  return '<button type="button" class="security-link" data-security="'+esc(strategy)+'" data-code="'+code6(code)+'"'
+    +' aria-label="查看'+esc(nm)+'基本信息">'+nameCode(nm,code)+'</button>';
+}
 function fp(v,d){ if(v==null||isNaN(v)) return '—'; return Number(v).toFixed(d==null?2:d); }
 function pct(v){ if(v==null||isNaN(v)) return '—'; return (v>0?'+':'')+fp(v,2)+'%'; }
 function cls(v){ return v==null?'flat':(v>0?'up':(v<0?'down':'flat')); }
@@ -3372,6 +3464,7 @@ function render(d){
   renderChart(d);
   renderMomentum(d);
   renderMicrocap(d);
+  closeSecurityInfo();
 }
 
 function avgPct(list){
@@ -3423,16 +3516,17 @@ function band(label, metaText, hpx, tilesHtml, footHtml){
     +(footHtml||'')
     +'</div>';
 }
-function tileHtml(nm, sb, pc, extra, isNew){
+function tileHtml(nm, sb, pc, extra, isNew, strategy, code){
   var tcls = pc==null ? 't-flat' : (pc>0?'t-up':(pc<0?'t-down':'t-flat'));
   if(extra) tcls=extra;
   var tip = nm + (sb?' '+sb:'') + (pc!=null?(' '+(pc>0?'+':'')+pc.toFixed(2)+'%'):'');
-  return '<div class="tile '+tcls+'" title="'+esc(tip)+'">'
-    +(isNew?'<div class="bdg">新</div>':'')
+  var content=(isNew?'<div class="bdg">新</div>':'')
     +'<div class="nm">'+esc(nm)+'</div>'
     +(sb?'<div class="sb num">'+esc(sb)+'</div>':'')
-    +(pc!=null?'<div class="pc num '+cls(pc)+'">'+pct(pc)+'</div>':'')
-    +'</div>';
+    +(pc!=null?'<div class="pc num '+cls(pc)+'">'+pct(pc)+'</div>':'');
+  if(!strategy||!code) return '<div class="tile '+tcls+'" title="'+esc(tip)+'">'+content+'</div>';
+  return '<button type="button" class="tile '+tcls+'" data-security="'+esc(strategy)+'" data-code="'+code6(code)+'"'
+    +' title="'+esc(tip)+'" aria-label="'+esc(tip+'，点击查看基本信息')+'">'+content+'</button>';
 }
 /* 较上日变动行: 新进计数 + 退出名单(超3只折叠) */
 function chgFoot(changes){
@@ -3461,29 +3555,22 @@ function renderMap(d){
 
   var b1 = d.b1.holdings||[];
   var b1Tiles = b1.map(function(x){
-    return tileHtml(x.name, code6(x.code), x.pct_chg, null, x.is_new);
+    return tileHtml(x.name, code6(x.code), x.pct_chg, null, x.is_new, 'micro', x.code);
   }).join('');
 
   var dv = d.dividend.holdings||[];
   var dvTiles = dv.map(function(x){
-    return tileHtml(x.name, code6(x.code), x.pct_chg, null, x.is_new);
+    return tileHtml(x.name, code6(x.code), x.pct_chg, null, x.is_new, 'dividend', x.code);
   }).join('');
 
   var etf = d.etf||{};
   var pool = etf.pool||[];
-  var tgtNames = (etf.targets||[]).map(function(t){return t.name;}).join('/');
-  var tgtCodes = (etf.targets||[]).map(function(t){return code6(t.code);}).join('/');
-  var tgtNew = (etf.targets||[]).some(function(t){return t.is_new;});
-  var corePct = null;
-  if((etf.targets||[]).length){
-    var sum = etf.targets.reduce(function(s,t){
-      var it = pool.filter(function(x){return x.code===t.code;})[0];
-      return s + t.weight * (it?it.pct_chg:0);
-    }, 0);
-    corePct = Math.round(sum*100)/100;
-  }
-  /* 与其他子策略一致的竖排格子; 空仓时无涨跌数字 */
-  var coreTile = tileHtml(tgtNames||'持有现金', tgtCodes||null, corePct, null, tgtNew);
+  /* 双标的同时入选时分别可点击；空仓现金不弹标的信息 */
+  var coreTile = (etf.targets||[]).length ? etf.targets.map(function(t){
+    var it=pool.filter(function(x){return x.code===t.code;})[0]||{};
+    var pc=isFinite(t.pct_chg)?t.pct_chg:(isFinite(it.pct_chg)?it.pct_chg:null);
+    return tileHtml(t.name, code6(t.code), pc, null, t.is_new, 'core', t.code);
+  }).join('') : tileHtml('持有现金', null, null, null, false);
 
   var basis = (d.meta && d.meta.basis) || {};
   var bd = function(k){ return basis[k] ? ' · 名单' + basis[k].slice(5).replace('-', '/') : ''; };
@@ -3507,9 +3594,9 @@ function tblRow(cols){
 function renderDetail(d){
   var b1=(d.b1.holdings||[]).slice().sort(function(a,b){return a.circ_mv-b.circ_mv;});
   var h='<div><h4>质量微盘 · 按流通市值升序</h4><table class="dtable"><tr><th>名称</th><th>流通市值(亿)</th><th>股东合成分</th><th>涨跌幅</th></tr>';
-  b1.forEach(function(x){ h+=tblRow([nameCode(x.name,x.code),fp(x.circ_mv,1),(x.holder_comp==null?'—':fp(x.holder_comp,3)),pctHtml(x.pct_chg)]); });
+  b1.forEach(function(x){ h+=tblRow([securityLink('micro',x.name,x.code),fp(x.circ_mv,1),(x.holder_comp==null?'—':fp(x.holder_comp,3)),pctHtml(x.pct_chg)]); });
   h+='</table></div><div><h4>红利成长</h4><table class="dtable"><tr><th>名称</th><th>PB</th><th>PE</th><th>股息率</th><th>涨跌幅</th></tr>';
-  (d.dividend.holdings||[]).forEach(function(x){ h+=tblRow([nameCode(x.name,x.code),fp(x.pb,2),fp(x.pe,1),(x.dv_ttm==null?'—':fp(x.dv_ttm,2)+'%'),pctHtml(x.pct_chg)]); });
+  (d.dividend.holdings||[]).forEach(function(x){ h+=tblRow([securityLink('dividend',x.name,x.code),fp(x.pb,2),fp(x.pe,1),(x.dv_ttm==null?'—':fp(x.dv_ttm,2)+'%'),pctHtml(x.pct_chg)]); });
   h+='</table></div><div><h4>核心资产 · 22日动量 <span class="rt">'+coreTargetText(d.etf)+'</span></h4>';
   h+=trackTable(d.etf, '22日动量');
   h+='<div class="signal">'+coreSignalText(d.etf)+'</div></div>';
@@ -3533,7 +3620,7 @@ function trackTable(etf, tname){
   codes.forEach(function(code){
     var dd=t.detail[code];
     var picked=(t.pick===code);
-    rows+='<tr'+(picked?' class="pick"':'')+'><td>'+(picked?'● ':'')+nameCode(dd.name, code)+'</td>'
+    rows+='<tr'+(picked?' class="pick"':'')+'><td>'+(picked?'● ':'')+securityLink('core',dd.name,code)+'</td>'
       +'<td class="num '+(dd.annualized>0?'up':(dd.annualized<0?'down':'flat'))+'">'+pct(dd.annualized*100)+'</td>'
       +'<td class="num">'+fp(dd.r2,2)+'</td>'
       +'<td class="num '+scoreCls(dd.score)+'">'+fmtScore(dd.score)+'</td>'
@@ -3758,8 +3845,113 @@ function drawMicroChart(trend){
     +line('amt_pct','s1')+line('senti_pct','sd')+dots+'</svg>';
 }
 
-/* ---------------- 交互 ---------------- */
+/* ---------------- 标的信息弹层与微立体交互 ---------------- */
+var securityTrigger=null;
+function hasValue(v){ return v!=null&&v!==''&&!(typeof v==='number'&&!isFinite(v)); }
+function infoValue(v){ return hasValue(v)?esc(v):'缺失'; }
+function securityItem(label,value,wide,valueClass){
+  return '<div class="security-item'+(wide?' wide':'')+'"><span class="lab">'+esc(label)+'</span>'
+    +'<span class="val num '+(valueClass||'')+'">'+infoValue(value)+'</span></div>';
+}
+function findSecurity(strategy,code,d){
+  code=code6(code);
+  if(strategy==='micro') return (d.b1.holdings||[]).filter(function(x){return code6(x.code)===code;})[0];
+  if(strategy==='dividend') return (d.dividend.holdings||[]).filter(function(x){return code6(x.code)===code;})[0];
+  if(strategy==='core'){
+    var pool=(d.etf.pool||[]).filter(function(x){return code6(x.code)===code;})[0]||{};
+    var target=(d.etf.targets||[]).filter(function(x){return code6(x.code)===code;})[0]||{};
+    var track=(d.etf.tracks||{})['22日动量']||{};
+    var momentum=(track.detail||{})[code]||{};
+    return Object.assign({},pool,target,momentum);
+  }
+}
+function openSecurityInfo(trigger){
+  var strategy=trigger.getAttribute('data-security'), code=code6(trigger.getAttribute('data-code'));
+  var d=ensureView(), item=findSecurity(strategy,code,d);
+  if(!item) return;
+  var names={micro:'质量微盘',dividend:'红利成长',core:'核心资产'};
+  var industry=[item.sw_l1,item.sw_l2].filter(hasValue).join(' / ');
+  var rows='';
+  if(strategy==='core'){
+    rows+=securityItem('申万板块','不适用（ETF/LOF）',true);
+  }else{
+    rows+=securityItem('申万板块',industry,true);
+  }
+  rows+=securityItem('最新收盘',hasValue(item.close)?fp(item.close,2):null);
+  rows+=securityItem('今日涨跌',hasValue(item.pct_chg)?pct(item.pct_chg):null,false,cls(item.pct_chg));
+  if(strategy==='micro'){
+    rows+=securityItem('流通市值',hasValue(item.circ_mv)?fp(item.circ_mv,1)+' 亿元':null);
+  }else if(strategy==='dividend'){
+    rows+=securityItem('PB',hasValue(item.pb)?fp(item.pb,2):null);
+    rows+=securityItem('PE',hasValue(item.pe)?fp(item.pe,1):null);
+    rows+=securityItem('股息率',hasValue(item.dv_ttm)?fp(item.dv_ttm,2)+'%':null);
+  }else if(strategy==='core'){
+    rows+=securityItem('年化',hasValue(item.annualized)?pct(item.annualized*100):null,false,cls(item.annualized));
+    rows+=securityItem('得分',hasValue(item.score)?fmtScore(item.score):null,false,scoreCls(item.score));
+    rows+=securityItem('ETF/LOF溢价率',hasValue(item.premium_pct)?pct(item.premium_pct):null,false,cls(item.premium_pct));
+  }
+  securityTrigger=trigger;
+  $('security-name').textContent=item.name||code;
+  $('security-subtitle').textContent=code+' · '+names[strategy];
+  $('security-grid').innerHTML=rows;
+  $('security-date').textContent='行情日期 '+(d.meta&&d.meta.quote_date||'缺失')+' · 数据随每日看板更新';
+  var pop=$('security-popover');
+  pop.hidden=false;
+  pop.classList.remove('is-opening');
+  void pop.offsetWidth;
+  pop.classList.add('is-opening');
+  positionSecurityInfo();
+  $('security-close').focus({preventScroll:true});
+}
+function positionSecurityInfo(){
+  var pop=$('security-popover');
+  if(!pop||pop.hidden||window.innerWidth<=560||!securityTrigger||!document.contains(securityTrigger)) return;
+  var rect=securityTrigger.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight;
+  var left=Math.max(12,Math.min(rect.left,window.innerWidth-pw-12));
+  var top=rect.bottom+8;
+  if(top+ph>window.innerHeight-12) top=Math.max(12,rect.top-ph-8);
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function closeSecurityInfo(restoreFocus){
+  var pop=$('security-popover');
+  if(!pop||pop.hidden) return;
+  pop.hidden=true;
+  if(restoreFocus&&securityTrigger&&document.contains(securityTrigger)) securityTrigger.focus({preventScroll:true});
+  securityTrigger=null;
+}
+function resetTilt(card){
+  if(!card) return;
+  card.style.setProperty('--rx','0deg'); card.style.setProperty('--ry','0deg');
+  card.classList.remove('is-tilting');
+}
 function bind(){
+  var tiltCard=null, finePointer=window.matchMedia('(hover:hover) and (pointer:fine)');
+  var reduceMotion=window.matchMedia('(prefers-reduced-motion:reduce)');
+  document.addEventListener('pointermove',function(e){
+    if(!finePointer.matches||reduceMotion.matches) return;
+    var card=e.target.closest&&e.target.closest('.tile,.mg-cell:not(.mg-head)');
+    if(tiltCard&&tiltCard!==card) resetTilt(tiltCard);
+    tiltCard=card;
+    if(!card) return;
+    var r=card.getBoundingClientRect();
+    var x=Math.max(0,Math.min(1,(e.clientX-r.left)/Math.max(1,r.width)));
+    var y=Math.max(0,Math.min(1,(e.clientY-r.top)/Math.max(1,r.height)));
+    card.style.setProperty('--rx',((0.5-y)*2.4).toFixed(2)+'deg');
+    card.style.setProperty('--ry',((x-0.5)*2.4).toFixed(2)+'deg');
+    card.classList.add('is-tilting');
+  },{passive:true});
+  document.addEventListener('pointerout',function(e){
+    if(tiltCard&&(!e.relatedTarget||!tiltCard.contains(e.relatedTarget))){ resetTilt(tiltCard); tiltCard=null; }
+  },{passive:true});
+  document.addEventListener('click',function(e){
+    var trigger=e.target.closest&&e.target.closest('[data-security]');
+    if(trigger){ openSecurityInfo(trigger); return; }
+    if(!e.target.closest||!e.target.closest('#security-popover')) closeSecurityInfo(false);
+  });
+  $('security-close').addEventListener('click',function(){ closeSecurityInfo(true); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeSecurityInfo(true); });
+  window.addEventListener('resize',function(){ positionSecurityInfo(); resetTilt(tiltCard); tiltCard=null; });
+
   var tabs=$('tabs'); if(!tabs) return;
   tabs.addEventListener('click',function(e){
     var b=e.target.closest&&e.target.closest('.tab'); if(!b) return;
