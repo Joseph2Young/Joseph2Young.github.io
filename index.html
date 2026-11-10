@@ -384,7 +384,7 @@
 <script id="fallback-data" type="application/json">
 {
  "meta": {
-  "generated_at": "2026-11-10 19:23:39",
+  "generated_at": "2026-11-10 19:36:10",
   "selection_date": "2026-11-09",
   "quote_date": "2026-11-10",
   "basis": {
@@ -4008,7 +4008,9 @@ function renderChart(d){
     if(cmsBox) cmsBox.style.display='';
     renderCmsWinChips();
     if(cmsHint) cmsHint.textContent='得分=年化×R² · 决策日 D 用截至 D-1 收盘的 '+(state.cmsWin||'20')+' 个净值点 · 纵轴为符号对数(对称压缩极值)';
-    drawSeries(cmsN,{boxId:'chart-cms',height:210,zeroLine:true,symlog:true,yFmt:function(v){ return Math.abs(v)>=10?v.toFixed(0):v.toFixed(1); }});
+    /* clip 0.99: 5 日窗口在暴力反弹段能算出百万级年化, symlog 后仍会把刻度撑到 1e6;
+       按 0.5%~99.5% 分位收边, 超界点夹到边界并画空心圈标记 */
+    drawSeries(cmsN,{boxId:'chart-cms',height:210,zeroLine:true,symlog:true,clip:0.99,markClip:true,yFmt:function(v){ return Math.abs(v)>=10?v.toFixed(0):v.toFixed(1); }});
   }else{
     if(cmsBox) cmsBox.style.display='none';
     var cleg=$('chart-cms-legend'); if(cleg) cleg.innerHTML='';
